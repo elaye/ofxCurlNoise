@@ -3,7 +3,7 @@
 void ofxCurlNoise::setup(int n){
 
 	parameters.setName("Curl noise parameters");
-	parameters.add(turbulence.set("Turbulence", 0.2, 0.0, 1.0));
+	parameters.add(turbulence.set("Turbulence", 0.5, 0.0, 1.0));
 	parameters.add(noisePositionScale.set("Position scale", 0.005, 0.001, 0.02));
 	parameters.add(noiseTimeScale.set("Time scale", 1.0, 0.001, 2.0));
 	parameters.add(noiseScale.set("Noise scale", 0.02, 0.001, 0.02));
@@ -28,47 +28,18 @@ void ofxCurlNoise::initEmitter(){
 }
 
 void ofxCurlNoise::initParticles(){
-	for(uint i = 0; i < particles.size(); ++i){		
-		// particles[i].pos.x = ofRandom(-100, 100);
-		// particles[i].pos.y = ofRandom(-100, 100);
-		// particles[i].pos.z = ofRandom(-100, 100);
-		particles[i].pos.x = ofRandom(-50, 50);
-		particles[i].pos.y = ofRandom(-50, 50);
-		particles[i].pos.z = 0.0;
-		particles[i].pos.w = 1.0;
-		particles[i].vel = ofVec4f(0.1, 0.1, 0.0, 0.0);
+
+	for(uint i = 0; i < particles.size(); ++i){
+		particles[i].pos = ofVec4f(ofGetWidth()/2.0, ofGetHeight()/2.0, 0.0, 1.0);
+		particles[i].vel = ofVec4f(0.0);
 		particles[i].acc = ofVec4f(0.0);
-		particles[i].lifespan.x = ofRandom(0, 120);
-		// particles[i].lifespan.x = 360.0;
+		particles[i].lifespan.x = ofRandom(120.0);
 	}	
 }
 
-void ofxCurlNoise::update(){
-
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-	emitterShader.begin();
-		emitterShader.setUniform2f("emitterPos", emitter.pos.x, emitter.pos.y);
-		emitterShader.setUniform2f("emitterVel", emitter.vel.x, emitter.vel.y);
-		emitterShader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
-	emitterShader.end();
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-	// curlNoiseShader.begin();
-	// 	curlNoiseShader.setUniform1f("NOISE_POSITION_SCALE", noisePositionScale);
-	// 	curlNoiseShader.setUniform1f("NOISE_SCALE", noiseScale);
-	// 	curlNoiseShader.setUniform1f("NOISE_TIME_SCALE", noiseTimeScale);
-	// 	curlNoiseShader.setUniform1f("BASE_SPEED_SCALE", baseSpeedScale);
-
-	// 	curlNoiseShader.setUniform1f("time", ofGetElapsedTimef());
-	// 	curlNoiseShader.setUniform1f("persistence", turbulence);
-	// 	curlNoiseShader.setUniform2f("emitterPos", emitter.pos.x, emitter.pos.y);
-	// 	curlNoiseShader.setUniform2f("emitterVel", emitter.vel.x, emitter.vel.y);
-	// 	curlNoiseShader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
-	// 	// glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
-	// 	// glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	// 	// glMemoryBarrier(GL_ALL_BARRIER_BITS);
-	// 	// glFinish();
-	// curlNoiseShader.end();	
+void ofxCurlNoise::update(float x, float y){
+	updateEmitter(x, y);
+	updateCurlNoise();
 }
 
 void ofxCurlNoise::updateEmitter(float x, float y){
@@ -79,6 +50,33 @@ void ofxCurlNoise::updateEmitter(float x, float y){
 	emitter.acc.y = (emitter.vel.y - newVel.y)*dt;
 	emitter.vel = newVel;
 	prevTime = ofGetElapsedTimef();
+
+	// glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	emitterShader.begin();
+		emitterShader.setUniform2f("emitterPos", emitter.pos.x, emitter.pos.y);
+		emitterShader.setUniform2f("emitterVel", emitter.vel.x, emitter.vel.y);
+		emitterShader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
+	emitterShader.end();
+	// glMemoryBarrier(GL_ALL_BARRIER_BITS);
+}
+
+void ofxCurlNoise::updateCurlNoise(){
+	curlNoiseShader.begin();
+		curlNoiseShader.setUniform1f("NOISE_POSITION_SCALE", noisePositionScale);
+		curlNoiseShader.setUniform1f("NOISE_SCALE", noiseScale);
+		curlNoiseShader.setUniform1f("NOISE_TIME_SCALE", noiseTimeScale);
+		curlNoiseShader.setUniform1f("BASE_SPEED_SCALE", baseSpeedScale);
+
+		curlNoiseShader.setUniform1f("time", ofGetElapsedTimef());
+		curlNoiseShader.setUniform1f("persistence", turbulence);
+		curlNoiseShader.setUniform2f("emitterPos", emitter.pos.x, emitter.pos.y);
+		curlNoiseShader.setUniform2f("emitterVel", emitter.vel.x, emitter.vel.y);
+		curlNoiseShader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
+		// glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+		// glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+		// glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		// glFinish();
+	curlNoiseShader.end();
 }
 
 void ofxCurlNoise::loadEmitterShader(){
@@ -100,12 +98,6 @@ void ofxCurlNoise::loadEmitterShader(){
 		uniform vec2 emitterPos;
 		uniform vec2 emitterVel;
 
-		// LFSR_Rand_Gen
-		// int rand(int n){
-		//   // <<, ^ and & require GL_EXT_gpu_shader4.
-		// 	n = (n << 13) ^ n;
-		// 	return (n * (n*n*15731+789221) + 1376312589) & 0x7fffffff;
-		// }
 		uint rng_state;
 
 		float rand_xorshift(){
@@ -135,9 +127,9 @@ void ofxCurlNoise::loadEmitterShader(){
 			p[gid].lifespan.x -= 1.0;
 			if(p[gid].lifespan.x < 0.0){
 				p[gid].pos = vec4(emitterPos, 0.0, 1.0);
-				p[gid].vel = vec4(-emitterVel*rand(-2.0, 2.0), 0.0, 1.0);
+				p[gid].vel = vec4(-emitterVel*rand(-2.0, 2.0)+vec2(rand(-0.5, 0.5), rand(-0.5, 0.5)), 0.0, 1.0);
 			// 	p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
-				p[gid].lifespan.x = 120.0;
+				p[gid].lifespan.x = 120.0*rand(0.8, 1.2);
 			}else{
 				p[gid].vel.xyz += p[gid].acc.xyz;
 				p[gid].pos.xyz += p[gid].vel.xyz;
@@ -340,39 +332,9 @@ void ofxCurlNoise::loadCurlNoiseShader(){
 			// vec3 velocity = vec3(BASE_SPEED_SCALE*10, 0.0, 0.0);
 			// vec3 totalVelocity = velocity + noiseVelocity;
 			vec3 totalVelocity = p[gid].vel.xyz + noiseVelocity;
-			vec3 newPosition;
-			// if(oldPosition.x > 300.0){
-			// 	vec2 seed = vec2(time, 3*time);
-			// 	newPosition = vec3(20*snoise(3*seed+gid)-310, 
-			// 						20*snoise(seed+gid)-10, 
-			// 						20*snoise(5*seed+gid)-10) + totalVelocity;
-			// }
-			// else{
-				newPosition = oldPosition + totalVelocity*0.2;// * deltaTime;
-			// }
-			p[gid].lifespan.x -= 1.0;
-			if(p[gid].lifespan.x < 0.0){
-				p[gid].pos = vec4(emitterPos, 0.0, 1.0);
-				p[gid].vel = vec4(emitterVel, 0.0, 1.0);
-				p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
-				p[gid].lifespan.x = 120.0;
-			}else{
-				p[gid].pos = vec4(newPosition, 1.0);
-				p[gid].pos = vec4(emitterPos, 0.0, 1.0);
-			}
-			// float oldLifetime = data.a;
-			// float newLifetime = oldLifetime - deltaTime;
-			// vec4 spawnData = texture2D(u_spawnTexture, textureCoordinates);
-			// if (newLifetime < 0.0){
-				// newPosition = spawnData.rgb;
-				// newLifetime = spawnData.a + newLifetime;
-			// }
-			// gl_FragColor = vec4(newPosition, newLifetime);
-			// newPosition = oldPosition+10*vec3(snoise(vec2(oldPosition.x, oldPosition.x)/10), 
-			// 					snoise(vec2(oldPosition.y, oldPosition.y)/10),
-			// 					snoise(vec2(oldPosition.z, oldPosition.z)/10));
+			vec3 newPosition = oldPosition + totalVelocity*0.2;// * deltaTime;
 
-			// p[gid].pos = vec4(newPosition, 1.0);
+			p[gid].pos = vec4(newPosition, 1.0);
 
 		}
 	);

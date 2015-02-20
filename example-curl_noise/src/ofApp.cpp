@@ -5,7 +5,7 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofSetFrameRate(60);
 
-	curlNoise.setup(128*128);
+	curlNoise.setup(1024*256);
 	particlesVbo = curlNoise.getParticleBuffer();
 
 	gui.setup(curlNoise.parameters);
@@ -16,16 +16,19 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 	fps = ofToString(ofGetFrameRate());
+	// curlNoise.update(ofGetMouseX()-ofGetWidth()/2.0, ofGetMouseY()-ofGetHeight()/2.0);
 	curlNoise.updateEmitter(ofGetMouseX()-ofGetWidth()/2.0, ofGetMouseY()-ofGetHeight()/2.0);
-	curlNoise.update();
+	curlNoise.updateCurlNoise();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	ofBackgroundGradient(ofColor(15, 16, 37), ofColor(11, 11, 10));
-
+	// ofBackgroundGradient(ofColor(15, 16, 37), ofColor(11, 11, 10));
+	ofBackground(ofColor::black);
+	ofEnableBlendMode(OF_BLENDMODE_ALPHA);
 	ofPushMatrix();
 		ofTranslate(ofGetWidth()/2.0, ofGetHeight()/2.0);	
+		ofSetColor(ofColor(200, 0, 0, 50));
 	// cam.begin();
 		particlesVbo.draw(GL_POINTS, 0, particlesVbo.getNumVertices());
 	// cam.end();

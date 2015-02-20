@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 
-#define WORK_GROUP_SIZE 16
+#define WORK_GROUP_SIZE 256
 #define STRINGIFY(...) #__VA_ARGS__
 
 struct Emitter {
@@ -35,8 +35,9 @@ class ofxCurlNoise {
 	public:
 		ofParameterGroup parameters;
 		void setup(int n);
-		void update();
+		void update(float x, float y);
 		void updateEmitter(float x, float y);
+		void updateCurlNoise();
 
 		ofVbo& getParticleBuffer(){ return vbo; }
 
