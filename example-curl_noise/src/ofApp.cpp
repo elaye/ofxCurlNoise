@@ -5,7 +5,8 @@ void ofApp::setup(){
 	ofSetFrameRate(60);
 
 	curlNoise.setup(1024*256);
-	particlesVbo = curlNoise.getParticleBuffer();
+	// For render shader example
+	// particlesVbo = curlNoise.getParticleBuffer();
 
 	gui.setup(curlNoise.parameters);
 	gui.add(fps.setup("Fps:", ""));
@@ -25,7 +26,9 @@ void ofApp::draw(){
 		ofTranslate(ofGetWidth()/2.0, ofGetHeight()/2.0);	
 		ofSetColor(ofColor(200, 0, 0, 50));
 	// cam.begin();
-		particlesVbo.draw(GL_POINTS, 0, particlesVbo.getNumVertices());
+		// For render shader example
+		// particlesVbo.draw(GL_POINTS, 0, particlesVbo.getNumVertices());
+		curlNoise.draw();
 	// cam.end();
 	ofPopMatrix();
 	

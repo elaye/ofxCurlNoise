@@ -11,12 +11,15 @@ class ofxCurlNoise {
 	ParticleEmitter particleEmitter;
 	CurlNoise curlNoise;
 
+	ofVbo particlesVbo;
+
 	public:
 		ofParameterGroup parameters;
 		void setup(int n);
 		void update(float x, float y);
+		void draw();
 
-		ofVbo& getParticleBuffer(){ return particleEmitter.getVbo(); }
+		ofVbo& getParticleBuffer(){ return particlesVbo; }
 
 };
 
