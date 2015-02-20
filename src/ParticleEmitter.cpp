@@ -15,6 +15,9 @@ void ParticleEmitter::setup(int n){
 	parameters.setName("Particle emitter");
 	parameters.add(averageLifespan.set("Average lifespan", 120.0, 1.0, 3600.0));
 	parameters.add(lifespanVariation.set("Lifespan variation", 50.0, 0.0, 100.0));
+	parameters.add(averageVelocity.set("Average vel.", 0.5, 0.0, 2.5));
+	parameters.add(velocityVariation.set("Vel. variation", 100.0, 0.0, 100.0));
+	parameters.add(bAddEmitterVelocity.set("Add emitter vel.", true));
 	parameters.add(emitterRadius.set("Radius", 3.0, 1.0, 30.0));
 
 	loadShader();
@@ -45,6 +48,9 @@ void ParticleEmitter::update(float x, float y){
 		shader.setUniform1f("emitterRadius", emitterRadius);
 		shader.setUniform1f("averageLifespan", averageLifespan);
 		shader.setUniform1f("lifespanVariation", lifespanVariation);
+		shader.setUniform1f("averageVelocity", averageVelocity);
+		shader.setUniform1f("velocityVariation", velocityVariation);
+		shader.setUniform1f("addEmitterVelocity", (bAddEmitterVelocity)? -1.0 : 1.0);
 		shader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
 	shader.end();
 }
@@ -71,6 +77,9 @@ void ParticleEmitter::loadShader(){
 		uniform float emitterRadius;
 		uniform float averageLifespan;
 		uniform float lifespanVariation;
+		uniform float averageVelocity;
+		uniform float velocityVariation;
+		uniform float addEmitterVelocity;
 
 		uint rng_state;
 
@@ -96,10 +105,19 @@ void ParticleEmitter::loadShader(){
 
 		void respawn(uint gid){
 			float theta = rand(0.0, 2*M_PI);
-			float x = rand(0.0, emitterRadius)*cos(theta);
-			float y = rand(0.0, emitterRadius)*sin(theta);
-			p[gid].pos = vec4(emitterPos+vec2(x,y), 0.0, 1.0);
-			p[gid].vel = vec4(-emitterVel*rand(-2.0, 2.0)+vec2(rand(-0.5, 0.5), rand(-0.5, 0.5)), 0.0, 1.0);
+			float r = rand(0.0, emitterRadius);
+			float x = r*cos(theta);
+			float y = r*sin(theta);
+			p[gid].pos = vec4(emitterPos+vec2(x, y), 0.0, 1.0);
+			float velNorm = averageVelocity*(1.0 + rand(-velocityVariation, velocityVariation)/100.0);
+			float vx = velNorm*cos(theta);
+			float vy = velNorm*sin(theta);
+			if(addEmitterVelocity > 0.0){
+				p[gid].vel = vec4(-emitterVel + vec2(vx, vy), 0.0, 1.0);				
+			}
+			else{
+				p[gid].vel = vec4(-normalize(emitterVel)*vec2(vx, vy), 0.0, 1.0);
+			}
 			p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
 			p[gid].lifespan.x = averageLifespan*(1.0 + rand(-lifespanVariation, lifespanVariation)/100.0);
 		}

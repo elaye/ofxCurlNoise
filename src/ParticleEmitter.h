@@ -17,7 +17,11 @@ class ParticleEmitter{
 	ofVec4f pos, vel, acc;
 	float prevTime;
 
-	ofParameter<float> emitterRadius, averageLifespan, lifespanVariation;
+	ofParameter<float> emitterRadius, 
+						averageLifespan, lifespanVariation, 
+						averageVelocity, velocityVariation;
+
+	ofParameter<bool> bAddEmitterVelocity;
 
 	vector<Particle> particles;
 	ofBufferObject particlesBuffer;
