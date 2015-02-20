@@ -16,9 +16,7 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 	fps = ofToString(ofGetFrameRate());
-	// curlNoise.update(ofGetMouseX()-ofGetWidth()/2.0, ofGetMouseY()-ofGetHeight()/2.0);
-	curlNoise.updateEmitter(ofGetMouseX()-ofGetWidth()/2.0, ofGetMouseY()-ofGetHeight()/2.0);
-	curlNoise.updateCurlNoise();
+	curlNoise.update(ofGetMouseX()-ofGetWidth()/2.0, ofGetMouseY()-ofGetHeight()/2.0);
 }
 
 //--------------------------------------------------------------
