@@ -12,6 +12,9 @@ void ParticleEmitter::setup(int n){
 	particlesBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 0);
 	prevTime = 0.0;
 
+	parameters.setName("Particle emitter");
+	parameters.add(emitterRadius.set("Radius", 3.0, 1.0, 30.0));
+
 	loadShader();
 }
 
@@ -34,18 +37,18 @@ void ParticleEmitter::update(float x, float y){
 	vel = newVel;
 	prevTime = ofGetElapsedTimef();
 
-	// glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	shader.begin();
 		shader.setUniform2f("emitterPos", pos.x, pos.y);
 		shader.setUniform2f("emitterVel", vel.x, vel.y);
+		shader.setUniform1f("emitterRadius", emitterRadius);
 		shader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
 	shader.end();
-	// glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 
 void ParticleEmitter::loadShader(){
 	ostringstream cs;
 	cs << "#version 430\n";
+	cs << "#define M_PI 3.1415926535897932384626433832795\n";
 	cs << "layout(local_size_x = " << WORK_GROUP_SIZE << ", local_size_y = 1, local_size_z = 1) in;\n";
 	cs << STRINGIFY(
 		struct Particle{
@@ -61,6 +64,7 @@ void ParticleEmitter::loadShader(){
 
 		uniform vec2 emitterPos;
 		uniform vec2 emitterVel;
+		uniform float emitterRadius;
 
 		uint rng_state;
 
@@ -84,17 +88,26 @@ void ParticleEmitter::loadShader(){
 			return randNum;
 		}
 
+		void respawn(uint gid){
+			float theta = rand(0.0, 2*M_PI);
+			float x = rand(0.0, emitterRadius)*cos(theta);
+			float y = rand(0.0, emitterRadius)*sin(theta);
+			p[gid].pos = vec4(emitterPos+vec2(x,y), 0.0, 1.0);
+			p[gid].vel = vec4(-emitterVel*rand(-2.0, 2.0)+vec2(rand(-0.5, 0.5), rand(-0.5, 0.5)), 0.0, 1.0);
+			p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
+			p[gid].lifespan.x = 120.0*rand(0.8, 1.2);
+		}
+
 		void main(){
 			uint gid = gl_GlobalInvocationID.x;
 			rng_state = gid;
 
 			p[gid].lifespan.x -= 1.0;
+			// Dead?
 			if(p[gid].lifespan.x < 0.0){
-				p[gid].pos = vec4(emitterPos, 0.0, 1.0);
-				p[gid].vel = vec4(-emitterVel*rand(-2.0, 2.0)+vec2(rand(-0.5, 0.5), rand(-0.5, 0.5)), 0.0, 1.0);
-			// 	p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
-				p[gid].lifespan.x = 120.0*rand(0.8, 1.2);
-			}else{
+				respawn(gid);
+			}
+			else{
 				p[gid].vel.xyz += p[gid].acc.xyz;
 				p[gid].pos.xyz += p[gid].vel.xyz;
 			}

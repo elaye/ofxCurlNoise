@@ -17,6 +17,8 @@ class ParticleEmitter{
 	ofVec4f pos, vel, acc;
 	float prevTime;
 
+	ofParameter<float> emitterRadius;
+
 	vector<Particle> particles;
 	ofBufferObject particlesBuffer;
 	ofVbo vbo;
