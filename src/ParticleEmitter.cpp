@@ -13,6 +13,8 @@ void ParticleEmitter::setup(int n){
 	prevTime = 0.0;
 
 	parameters.setName("Particle emitter");
+	parameters.add(averageLifespan.set("Average lifespan", 120.0, 1.0, 3600.0));
+	parameters.add(lifespanVariation.set("Lifespan variation", 50.0, 0.0, 100.0));
 	parameters.add(emitterRadius.set("Radius", 3.0, 1.0, 30.0));
 
 	loadShader();
@@ -24,7 +26,7 @@ void ParticleEmitter::initParticles(){
 		particles[i].pos = ofVec4f(ofGetWidth()/2.0, ofGetHeight()/2.0, 0.0, 1.0);
 		particles[i].vel = ofVec4f(0.0);
 		particles[i].acc = ofVec4f(0.0);
-		particles[i].lifespan.x = ofRandom(120.0);
+		particles[i].lifespan.x = averageLifespan*(1.0 + ofRandom(-lifespanVariation, lifespanVariation)/100.0);
 	}	
 }
 
@@ -41,6 +43,8 @@ void ParticleEmitter::update(float x, float y){
 		shader.setUniform2f("emitterPos", pos.x, pos.y);
 		shader.setUniform2f("emitterVel", vel.x, vel.y);
 		shader.setUniform1f("emitterRadius", emitterRadius);
+		shader.setUniform1f("averageLifespan", averageLifespan);
+		shader.setUniform1f("lifespanVariation", lifespanVariation);
 		shader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
 	shader.end();
 }
@@ -65,6 +69,8 @@ void ParticleEmitter::loadShader(){
 		uniform vec2 emitterPos;
 		uniform vec2 emitterVel;
 		uniform float emitterRadius;
+		uniform float averageLifespan;
+		uniform float lifespanVariation;
 
 		uint rng_state;
 
@@ -95,7 +101,7 @@ void ParticleEmitter::loadShader(){
 			p[gid].pos = vec4(emitterPos+vec2(x,y), 0.0, 1.0);
 			p[gid].vel = vec4(-emitterVel*rand(-2.0, 2.0)+vec2(rand(-0.5, 0.5), rand(-0.5, 0.5)), 0.0, 1.0);
 			p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
-			p[gid].lifespan.x = 120.0*rand(0.8, 1.2);
+			p[gid].lifespan.x = averageLifespan*(1.0 + rand(-lifespanVariation, lifespanVariation)/100.0);
 		}
 
 		void main(){
