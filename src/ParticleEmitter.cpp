@@ -15,7 +15,7 @@ void ParticleEmitter::setup(int n){
 
 	parameters.setName("Particle emitter");
 	parameters.add(averageLifespan.set("Average lifespan", 120.0, 1.0, 3600.0));
-	parameters.add(lifespanVariation.set("Lifespan variation", 50.0, 0.0, 100.0));
+	parameters.add(lifespanVariation.set("Lifespan variation", 100.0, 0.0, 100.0));
 	parameters.add(averageVelocity.set("Average vel.", 0.5, 0.0, 2.5));
 	parameters.add(velocityVariation.set("Vel. variation", 100.0, 0.0, 100.0));
 	parameters.add(bAddEmitterVelocity.set("Add emitter vel.", true));

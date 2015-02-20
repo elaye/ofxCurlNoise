@@ -6,10 +6,12 @@ void CurlNoise::setup(int n){
 
 	parameters.setName("Curl noise parameters");
 	parameters.add(turbulence.set("Turbulence", 0.5, 0.0, 1.0));
-	parameters.add(noisePositionScale.set("Position scale", 0.005, 0.001, 0.02));
-	parameters.add(noiseTimeScale.set("Time scale", 1.0, 0.001, 2.0));
-	parameters.add(noiseScale.set("Noise scale", 0.02, 0.001, 0.02));
-	parameters.add(baseSpeedScale.set("Speed scale", 2.0, 0.1, 2.0));
+
+	advancedParameters.setName("Curl noise advanced parameters");
+	advancedParameters.add(noisePositionScale.set("Position scale", 0.005, 0.001, 0.02));
+	advancedParameters.add(noiseTimeScale.set("Time scale", 1.0, 0.001, 2.0));
+	advancedParameters.add(noiseScale.set("Noise scale", 0.02, 0.001, 0.02));
+	// advancedParameters.add(baseSpeedScale.set("Speed scale", 2.0, 0.1, 2.0));
 
 	loadShader();
 }
@@ -19,7 +21,7 @@ void CurlNoise::update(){
 		curlNoiseShader.setUniform1f("NOISE_POSITION_SCALE", noisePositionScale);
 		curlNoiseShader.setUniform1f("NOISE_SCALE", noiseScale);
 		curlNoiseShader.setUniform1f("NOISE_TIME_SCALE", noiseTimeScale);
-		curlNoiseShader.setUniform1f("BASE_SPEED_SCALE", baseSpeedScale);
+		// curlNoiseShader.setUniform1f("BASE_SPEED_SCALE", baseSpeedScale);
 
 		curlNoiseShader.setUniform1f("time", ofGetElapsedTimef());
 		curlNoiseShader.setUniform1f("persistence", turbulence);
