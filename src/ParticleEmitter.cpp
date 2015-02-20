@@ -2,6 +2,7 @@
 
 void ParticleEmitter::setup(int n){
 	pos = ofPoint(ofGetMouseX(), ofGetMouseY());
+	prevPos = pos;
 	vel = ofPoint(0, 0);
 	acc = ofPoint(0, 0);
 
@@ -36,6 +37,7 @@ void ParticleEmitter::initParticles(){
 void ParticleEmitter::update(float x, float y){
 	float dt = ofGetElapsedTimef() - prevTime;
 	ofPoint newVel = ofPoint(pos.x - x, pos.y - y)*dt;
+	prevPos = pos;
 	pos = ofPoint(x, y);
 	acc.x = (vel.x - newVel.x)*dt;
 	acc.y = (vel.y - newVel.y)*dt;
@@ -43,6 +45,7 @@ void ParticleEmitter::update(float x, float y){
 	prevTime = ofGetElapsedTimef();
 
 	shader.begin();
+		shader.setUniform2f("emitterPrevPos", prevPos.x, prevPos.y);
 		shader.setUniform2f("emitterPos", pos.x, pos.y);
 		shader.setUniform2f("emitterVel", vel.x, vel.y);
 		shader.setUniform1f("emitterRadius", emitterRadius);
@@ -61,6 +64,8 @@ void ParticleEmitter::loadShader(){
 	cs << "#define M_PI 3.1415926535897932384626433832795\n";
 	cs << "layout(local_size_x = " << WORK_GROUP_SIZE << ", local_size_y = 1, local_size_z = 1) in;\n";
 	cs << STRINGIFY(
+	    precision highp float;
+
 		struct Particle{
 		    vec4 pos;
 		    vec4 vel;
@@ -72,6 +77,7 @@ void ParticleEmitter::loadShader(){
 			Particle p[];
 		};		
 
+		uniform vec2 emitterPrevPos;
 		uniform vec2 emitterPos;
 		uniform vec2 emitterVel;
 		uniform float emitterRadius;
@@ -108,7 +114,8 @@ void ParticleEmitter::loadShader(){
 			float r = rand(0.0, emitterRadius);
 			float x = r*cos(theta);
 			float y = r*sin(theta);
-			p[gid].pos = vec4(emitterPos+vec2(x, y), 0.0, 1.0);
+			vec2 newPos = mix(emitterPos, emitterPrevPos, rand(0.0, 1.0));
+			p[gid].pos = vec4(newPos+vec2(x, y), 0.0, 1.0);
 			float velNorm = averageVelocity*(1.0 + rand(-velocityVariation, velocityVariation)/100.0);
 			float vx = velNorm*cos(theta);
 			float vy = velNorm*sin(theta);

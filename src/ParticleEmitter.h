@@ -14,7 +14,7 @@ struct Particle {
 
 class ParticleEmitter{
 
-	ofVec4f pos, vel, acc;
+	ofVec4f pos, vel, acc, prevPos;
 	float prevTime;
 
 	ofParameter<float> emitterRadius, 
