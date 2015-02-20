@@ -1,6 +1,5 @@
 #include "ofApp.h"
 
-//--------------------------------------------------------------
 void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofSetFrameRate(60);
@@ -13,17 +12,15 @@ void ofApp::setup(){
 
 }
 
-//--------------------------------------------------------------
 void ofApp::update(){
 	fps = ofToString(ofGetFrameRate());
 	curlNoise.update(ofGetMouseX()-ofGetWidth()/2.0, ofGetMouseY()-ofGetHeight()/2.0);
 }
 
-//--------------------------------------------------------------
 void ofApp::draw(){
-	// ofBackgroundGradient(ofColor(15, 16, 37), ofColor(11, 11, 10));
 	ofBackground(ofColor::black);
 	ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+	
 	ofPushMatrix();
 		ofTranslate(ofGetWidth()/2.0, ofGetHeight()/2.0);	
 		ofSetColor(ofColor(200, 0, 0, 50));

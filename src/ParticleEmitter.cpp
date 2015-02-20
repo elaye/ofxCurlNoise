@@ -44,8 +44,10 @@ void ParticleEmitter::update(float x, float y){
 }
 
 void ParticleEmitter::loadShader(){
-	string cs = "#version 430\n";
-	cs += STRINGIFY(
+	ostringstream cs;
+	cs << "#version 430\n";
+	cs << "layout(local_size_x = " << WORK_GROUP_SIZE << ", local_size_y = 1, local_size_z = 1) in;\n";
+	cs << STRINGIFY(
 		struct Particle{
 		    vec4 pos;
 		    vec4 vel;
@@ -56,8 +58,6 @@ void ParticleEmitter::loadShader(){
 		layout(std430, binding=0) buffer particles{
 			Particle p[];
 		};		
-		
-		layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
 
 		uniform vec2 emitterPos;
 		uniform vec2 emitterVel;
@@ -101,6 +101,6 @@ void ParticleEmitter::loadShader(){
 		}
 	);
 
-	shader.setupShaderFromSource(GL_COMPUTE_SHADER, cs);
+	shader.setupShaderFromSource(GL_COMPUTE_SHADER, cs.str());
 	shader.linkProgram();	
 }

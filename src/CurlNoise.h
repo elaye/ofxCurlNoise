@@ -18,5 +18,5 @@ class CurlNoise{
 		void update();
 
 	private:
-		void loadCurlNoiseShader();
+		void loadShader();
 };

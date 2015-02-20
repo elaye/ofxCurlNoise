@@ -11,7 +11,7 @@ void CurlNoise::setup(int n){
 	parameters.add(noiseScale.set("Noise scale", 0.02, 0.001, 0.02));
 	parameters.add(baseSpeedScale.set("Speed scale", 2.0, 0.1, 2.0));
 
-	loadCurlNoiseShader();
+	loadShader();
 }
 
 void CurlNoise::update(){
@@ -23,20 +23,16 @@ void CurlNoise::update(){
 
 		curlNoiseShader.setUniform1f("time", ofGetElapsedTimef());
 		curlNoiseShader.setUniform1f("persistence", turbulence);
-		// curlNoiseShader.setUniform2f("emitterPos", emitter.pos.x, emitter.pos.y);
-		// curlNoiseShader.setUniform2f("emitterVel", emitter.vel.x, emitter.vel.y);
 		curlNoiseShader.dispatchCompute(particlesNumber/WORK_GROUP_SIZE, 1, 1);
-		// glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
-		// glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-		// glMemoryBarrier(GL_ALL_BARRIER_BITS);
-		// glFinish();
 	curlNoiseShader.end();
 }
 
-void CurlNoise::loadCurlNoiseShader(){
-	string cs = "#version 430\n";
-	cs += "#define F4 0.309016994374947451\n";
-	cs += STRINGIFY(
+void CurlNoise::loadShader(){
+	ostringstream cs;
+	cs << "#version 430\n";
+	cs << "#define F4 0.309016994374947451\n";
+	cs << "layout(local_size_x = " << WORK_GROUP_SIZE << ", local_size_y = 1, local_size_z = 1) in;\n";
+	cs << STRINGIFY(
 
 		struct Particle{
 		    vec4 pos;
@@ -49,12 +45,8 @@ void CurlNoise::loadCurlNoiseShader(){
 			Particle p[];
 		};		
 		
-		layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
-
 		uniform float time;
 		uniform float persistence;
-		// uniform vec2 emitterPos;
-		// uniform vec2 emitterVel;
 
 		const int OCTAVES = 3;
 
@@ -231,6 +223,6 @@ void CurlNoise::loadCurlNoiseShader(){
 		}
 	);
 
-	curlNoiseShader.setupShaderFromSource(GL_COMPUTE_SHADER, cs);
+	curlNoiseShader.setupShaderFromSource(GL_COMPUTE_SHADER, cs.str());
 	curlNoiseShader.linkProgram();
 }
