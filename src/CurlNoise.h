@@ -20,4 +20,5 @@ class CurlNoise{
 
 	private:
 		void loadShader();
+		string getNoiseShaderFunctions();
 };

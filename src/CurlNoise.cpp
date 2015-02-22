@@ -5,7 +5,7 @@ void CurlNoise::setup(int n){
 	particlesNumber = n;
 
 	parameters.setName("Curl noise parameters");
-	parameters.add(turbulence.set("Turbulence", 0.5, 0.0, 1.0));
+	parameters.add(turbulence.set("Turbulence", 0.8, 0.0, 1.0));
 
 	advancedParameters.setName("Curl noise advanced parameters");
 	advancedParameters.add(noisePositionScale.set("Position scale", 0.005, 0.001, 0.02));
@@ -31,9 +31,11 @@ void CurlNoise::update(){
 
 void CurlNoise::loadShader(){
 	ostringstream cs;
-	cs << "#version 430\n";
-	cs << "#define F4 0.309016994374947451\n";
-	cs << "layout(local_size_x = " << WORK_GROUP_SIZE << ", local_size_y = 1, local_size_z = 1) in;\n";
+	cs << "#version 430" << endl;
+	cs << "#define F4 0.309016994374947451" << endl;
+	cs << "layout(local_size_x = " << WORK_GROUP_SIZE << ", local_size_y = 1, local_size_z = 1) in;" << endl;
+	cs << getNoiseShaderFunctions() << endl;
+
 	cs << STRINGIFY(
 
 		struct Particle{
@@ -52,6 +54,48 @@ void CurlNoise::loadShader(){
 
 		const int OCTAVES = 3;
 
+		void main(){
+			uint gid = gl_GlobalInvocationID.x;
+
+			vec3 oldPosition = p[gid].pos.xyz;
+			vec3 noisePosition = oldPosition * NOISE_POSITION_SCALE;
+			float noiseTime = time * NOISE_TIME_SCALE;
+			vec4 xNoisePotentialDerivatives = vec4(0.0);
+			vec4 yNoisePotentialDerivatives = vec4(0.0);
+			vec4 zNoisePotentialDerivatives = vec4(0.0);
+			float persistence = persistence;
+			for(int i = 0; i < OCTAVES; ++i){
+				float scale = (1.0 / 2.0) * pow(2.0, float(i));
+				float noiseScale = pow(persistence, float(i));
+				if(persistence == 0.0 && i == 0){ //fix undefined behaviour
+					noiseScale = 1.0;
+				}
+				xNoisePotentialDerivatives += simplexNoiseDerivatives(vec4(noisePosition * pow(2.0, float(i)), noiseTime)) * noiseScale * scale;
+				yNoisePotentialDerivatives += simplexNoiseDerivatives(vec4((noisePosition + vec3(123.4, 129845.6, -1239.1)) * pow(2.0, float(i)), noiseTime)) * noiseScale * scale;
+				zNoisePotentialDerivatives += simplexNoiseDerivatives(vec4((noisePosition + vec3(-9519.0, 9051.0, -123.0)) * pow(2.0, float(i)), noiseTime)) * noiseScale * scale;
+			}
+			//compute curl noise
+			vec3 noiseVelocity = 100 * vec3(zNoisePotentialDerivatives[1] - yNoisePotentialDerivatives[2],
+										xNoisePotentialDerivatives[2] - zNoisePotentialDerivatives[0],
+										yNoisePotentialDerivatives[0] - xNoisePotentialDerivatives[1]
+										) * NOISE_SCALE;
+			// vec3 velocity = vec3(BASE_SPEED_SCALE*10, 0.0, 0.0);
+			// vec3 totalVelocity = velocity + noiseVelocity;
+			vec3 totalVelocity = p[gid].vel.xyz + noiseVelocity;
+			vec3 newPosition = oldPosition + totalVelocity*0.2;// * deltaTime;
+
+			p[gid].pos = vec4(newPosition, 1.0);
+
+		}
+	);
+
+	curlNoiseShader.setupShaderFromSource(GL_COMPUTE_SHADER, cs.str());
+	curlNoiseShader.linkProgram();
+}
+
+string CurlNoise::getNoiseShaderFunctions(){
+	ostringstream nfs;
+	nfs << STRINGIFY(
 		vec4 mod289(vec4 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
 		float mod289(float x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
 		vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
@@ -189,42 +233,6 @@ void CurlNoise::loadShader(){
 			g.yz = a0.yz * x12.xz + h.yz * x12.yw;
 			return 130.0 * dot(m, g);
 		}
-
-		void main(){
-			uint gid = gl_GlobalInvocationID.x;
-
-			vec3 oldPosition = p[gid].pos.xyz;
-			vec3 noisePosition = oldPosition * NOISE_POSITION_SCALE;
-			float noiseTime = time * NOISE_TIME_SCALE;
-			vec4 xNoisePotentialDerivatives = vec4(0.0);
-			vec4 yNoisePotentialDerivatives = vec4(0.0);
-			vec4 zNoisePotentialDerivatives = vec4(0.0);
-			float persistence = persistence;
-			for(int i = 0; i < OCTAVES; ++i){
-				float scale = (1.0 / 2.0) * pow(2.0, float(i));
-				float noiseScale = pow(persistence, float(i));
-				if(persistence == 0.0 && i == 0){ //fix undefined behaviour
-					noiseScale = 1.0;
-				}
-				xNoisePotentialDerivatives += simplexNoiseDerivatives(vec4(noisePosition * pow(2.0, float(i)), noiseTime)) * noiseScale * scale;
-				yNoisePotentialDerivatives += simplexNoiseDerivatives(vec4((noisePosition + vec3(123.4, 129845.6, -1239.1)) * pow(2.0, float(i)), noiseTime)) * noiseScale * scale;
-				zNoisePotentialDerivatives += simplexNoiseDerivatives(vec4((noisePosition + vec3(-9519.0, 9051.0, -123.0)) * pow(2.0, float(i)), noiseTime)) * noiseScale * scale;
-			}
-			//compute curl noise
-			vec3 noiseVelocity = 100 * vec3(zNoisePotentialDerivatives[1] - yNoisePotentialDerivatives[2],
-										xNoisePotentialDerivatives[2] - zNoisePotentialDerivatives[0],
-										yNoisePotentialDerivatives[0] - xNoisePotentialDerivatives[1]
-										) * NOISE_SCALE;
-			// vec3 velocity = vec3(BASE_SPEED_SCALE*10, 0.0, 0.0);
-			// vec3 totalVelocity = velocity + noiseVelocity;
-			vec3 totalVelocity = p[gid].vel.xyz + noiseVelocity;
-			vec3 newPosition = oldPosition + totalVelocity*0.2;// * deltaTime;
-
-			p[gid].pos = vec4(newPosition, 1.0);
-
-		}
 	);
-
-	curlNoiseShader.setupShaderFromSource(GL_COMPUTE_SHADER, cs.str());
-	curlNoiseShader.linkProgram();
+	return nfs.str();
 }

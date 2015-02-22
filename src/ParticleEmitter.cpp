@@ -1,7 +1,7 @@
 #include "ParticleEmitter.h"
 
 void ParticleEmitter::setup(int n){
-	pos = ofPoint(ofGetMouseX(), ofGetMouseY());
+	pos = ofPoint(ofGetWidth()/2.0, ofGetHeight()/2.0);
 	prevPos = pos;
 	vel = ofPoint(0, 0);
 	acc = ofPoint(0, 0);
@@ -15,10 +15,11 @@ void ParticleEmitter::setup(int n){
 
 	parameters.setName("Particle emitter");
 	parameters.add(averageLifespan.set("Average lifespan", 120.0, 1.0, 3600.0));
-	parameters.add(lifespanVariation.set("Lifespan variation", 100.0, 0.0, 100.0));
-	parameters.add(averageVelocity.set("Average vel.", 0.5, 0.0, 2.5));
+	parameters.add(lifespanVariation.set("Lifespan variation", 50.0, 0.0, 100.0));
+	parameters.add(averageVelocity.set("Average vel.", 1.3, 0.0, 2.5));
 	parameters.add(velocityVariation.set("Vel. variation", 100.0, 0.0, 100.0));
-	parameters.add(bAddEmitterVelocity.set("Add emitter vel.", true));
+	parameters.add(bUseEmitterVelocity.set("Use emitter vel.", true));
+	parameters.add(velocityScale.set("Velocity scale", -10.0, -100.0, 100.0));
 	parameters.add(emitterRadius.set("Radius", 3.0, 1.0, 30.0));
 
 	loadShader();
@@ -30,7 +31,8 @@ void ParticleEmitter::initParticles(){
 		particles[i].pos = ofVec4f(ofGetWidth()/2.0, ofGetHeight()/2.0, 0.0, 1.0);
 		particles[i].vel = ofVec4f(0.0);
 		particles[i].acc = ofVec4f(0.0);
-		particles[i].lifespan.x = averageLifespan*(1.0 + ofRandom(-lifespanVariation, lifespanVariation)/100.0);
+		particles[i].lifespan.x = ofRandom(0, averageLifespan);
+		// particles[i].lifespan.x = 0.0;
 	}	
 }
 
@@ -53,7 +55,8 @@ void ParticleEmitter::update(float x, float y){
 		shader.setUniform1f("lifespanVariation", lifespanVariation);
 		shader.setUniform1f("averageVelocity", averageVelocity);
 		shader.setUniform1f("velocityVariation", velocityVariation);
-		shader.setUniform1f("addEmitterVelocity", (bAddEmitterVelocity)? -1.0 : 1.0);
+		shader.setUniform1f("useEmitterVelocity", (bUseEmitterVelocity)? 1.0 : -1.0);
+		shader.setUniform1f("velocityScale", velocityScale);
 		shader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
 	shader.end();
 }
@@ -64,8 +67,6 @@ void ParticleEmitter::loadShader(){
 	cs << "#define M_PI 3.1415926535897932384626433832795\n";
 	cs << "layout(local_size_x = " << WORK_GROUP_SIZE << ", local_size_y = 1, local_size_z = 1) in;\n";
 	cs << STRINGIFY(
-	    precision highp float;
-
 		struct Particle{
 		    vec4 pos;
 		    vec4 vel;
@@ -85,7 +86,8 @@ void ParticleEmitter::loadShader(){
 		uniform float lifespanVariation;
 		uniform float averageVelocity;
 		uniform float velocityVariation;
-		uniform float addEmitterVelocity;
+		uniform float useEmitterVelocity;
+		uniform float velocityScale;
 
 		uint rng_state;
 
@@ -119,8 +121,8 @@ void ParticleEmitter::loadShader(){
 			float velNorm = averageVelocity*(1.0 + rand(-velocityVariation, velocityVariation)/100.0);
 			float vx = velNorm*cos(theta);
 			float vy = velNorm*sin(theta);
-			if(addEmitterVelocity > 0.0){
-				p[gid].vel = vec4(-emitterVel + vec2(vx, vy), 0.0, 1.0);				
+			if(useEmitterVelocity > 0.0){
+				p[gid].vel = vec4(emitterVel*velocityScale + vec2(vx, vy), 0.0, 1.0);				
 			}
 			else{
 				p[gid].vel = vec4(-normalize(emitterVel)*vec2(vx, vy), 0.0, 1.0);
@@ -131,6 +133,7 @@ void ParticleEmitter::loadShader(){
 
 		void main(){
 			uint gid = gl_GlobalInvocationID.x;
+			// rng_state = uint(floor(p[gid].pos.x*p[gid].pos.y*1000))*gid;
 			rng_state = gid;
 
 			p[gid].lifespan.x -= 1.0;
