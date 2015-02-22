@@ -13,6 +13,7 @@ class ofApp : public ofBaseApp{
 
 	ofEasyCam cam;
 
+	ofxFloatSlider speedCoeff;
 	ofxLabel fps;
 	ofxPanel gui;
 
