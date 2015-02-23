@@ -10,14 +10,14 @@ void ofApp::setup(){
 	ParticleEmitter emitter;
 	emitter.setup();
 	particleEmitters.push_back(emitter);
-	// particleEmitters[0].setup();
 	curlNoise.setup(particleEmitters, 1024*256);
 
 
 	// For render shader example
 	// particlesVbo = curlNoise.getParticleBuffer();
 
-	gui.setup(curlNoise.parameters);
+	// gui.setup(curlNoise.parameters);
+	gui.setup(particleEmitters[0].parameters);
 	gui.add(speedCoeff.setup("Speed", 2.0, 0.1, 5.0));
 	gui.add(fps.setup("Fps:", ""));
 
@@ -52,7 +52,7 @@ void ofApp::draw(){
 		curlNoise.draw();
 	// cam.end();
 		// particleEmitter.draw();
-		particleEmitters[0].draw();
+		// particleEmitters[0].draw();
 	ofPopMatrix();
 	
 	gui.draw();
