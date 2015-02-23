@@ -2,17 +2,18 @@
 
 #include "ofMain.h"
 
-#define WORK_GROUP_SIZE 256
-#define STRINGIFY(...) #__VA_ARGS__
-
-struct Particle {
+struct Emitter{
 	ofVec4f pos;
 	ofVec4f vel;
 	ofVec4f acc;
-	ofVec4f lifespan;
+	ofVec4f prevPos;
+	float radius;
+	float velocityScale;	
 };
 
 class ParticleEmitter{
+
+	static uint count;
 
 	ofVec4f pos, vel, acc, prevPos;
 	float prevTime;
@@ -23,19 +24,24 @@ class ParticleEmitter{
 
 	ofParameter<bool> bUseEmitterVelocity;
 
-	vector<Particle> particles;
-	ofBufferObject particlesBuffer;
-	ofVbo vbo;
-
-	ofShader shader;
-
 	public:
 		ofParameterGroup parameters;
-		void setup(int n);
+		ParticleEmitter(){ ++count; }
+		~ParticleEmitter(){ --count; }
+		void setup();
 		void update(float x, float y);
-		void initParticles();
-		void loadShader();
+		void draw();
 
-		ofVbo& getVbo(){ return vbo; }
+		const ofPoint getPos() const { return pos; }
+
+		operator const Emitter(void) const{
+			Emitter e;
+			e.pos = pos;
+			e.vel = vel;
+			e.acc = acc;
+			e.prevPos = prevPos;
+			return e;
+		}
+
 
 };

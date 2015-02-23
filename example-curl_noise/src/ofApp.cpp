@@ -4,7 +4,16 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofSetFrameRate(60);
 
-	curlNoise.setup(1024*256);
+	// particleEmitter.setup();
+	// curlNoise.setup(particleEmitter, 1024*256);
+
+	ParticleEmitter emitter;
+	emitter.setup();
+	particleEmitters.push_back(emitter);
+	// particleEmitters[0].setup();
+	curlNoise.setup(particleEmitters, 1024*256);
+
+
 	// For render shader example
 	// particlesVbo = curlNoise.getParticleBuffer();
 
@@ -23,7 +32,11 @@ void ofApp::update(){
 	float y = a*sin(t)*cos(t)/(1+sin(t)*sin(t));
 	// float x = 16*sin(t)*sin(t)*sin(t);
 	// float y = 13*cos(t)-5*cos(2*t)-2*cos(3*t)-4*cos(4*t);
-	curlNoise.update(x, y);
+	// particleEmitter.update(x, y);
+	particleEmitters[0].update(x, y);
+	// ofLog() << particleEmitters[0].getPos();
+
+	curlNoise.update();
 }
 
 void ofApp::draw(){
@@ -38,6 +51,8 @@ void ofApp::draw(){
 		// particlesVbo.draw(GL_POINTS, 0, particlesVbo.getNumVertices());
 		curlNoise.draw();
 	// cam.end();
+		// particleEmitter.draw();
+		particleEmitters[0].draw();
 	ofPopMatrix();
 	
 	gui.draw();

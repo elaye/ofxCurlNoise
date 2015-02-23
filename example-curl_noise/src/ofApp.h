@@ -8,8 +8,10 @@
 
 class ofApp : public ofBaseApp{
 
+	ParticleEmitter particleEmitter;
+	vector<ParticleEmitter> particleEmitters;
 	ofxCurlNoise curlNoise;
-	ofVbo particlesVbo;
+	// ofVbo particlesVbo;
 
 	ofEasyCam cam;
 
