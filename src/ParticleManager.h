@@ -16,7 +16,8 @@ struct Particle {
 
 class ParticleManager{
 
-	const vector<ParticleEmitter>& emitters;
+	// vector<ParticleEmitter*> emitters;
+	int emittersNb;
 	ofBufferObject emittersBuffer;
 
 	vector<Particle> particles;
@@ -27,17 +28,17 @@ class ParticleManager{
 	ofShader shader;
 	
 	public:
-		// ParticleManager(): emitters(){}
-		ParticleManager(const vector<ParticleEmitter>& _emitters, int n);
-		// void setup(vector<ParticleEmitter>* emitters, int n);
+		void setup(int k, int n);
+		// void addEmitter(const ParticleEmitter* emitter);
 		void update();
-		// void updateEmitters(vector<ofPoint> newPos);
+		void updateEmitter(ParticleEmitter& emitter);
 
 		ofVbo& getVbo(){ return vbo; }
 
 	private:
 		void initParticles();
 		void loadShader();
-		void updateEmitters();
+		vector<Emitter> getEmittersData();
+		// void updateEmitters();
 
 };

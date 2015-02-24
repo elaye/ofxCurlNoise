@@ -8,7 +8,7 @@
 
 class ofxCurlNoise {
 
-	shared_ptr<ParticleManager> particleManager;
+	ParticleManager particleManager;
 	CurlNoise curlNoise;
 
 	ofVbo particlesVbo;
@@ -16,14 +16,14 @@ class ofxCurlNoise {
 	public:
 		ofParameterGroup parameters;
 		void setup(ParticleEmitter& emitter, int n);
-		void setup(const vector<ParticleEmitter>& emitters, int n);
+		void setup(vector<ParticleEmitter>& emitters, int n);
 		void update();
 		void draw();
 
 		ofVbo& getParticleBuffer(){ return particlesVbo; }
 
 	private:
-		void setup(int n);
+		void setup(int k, int n);
 
 };
 
