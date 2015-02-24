@@ -8,15 +8,13 @@
 
 class ofApp : public ofBaseApp{
 
-	// ParticleEmitter particleEmitter;
-	vector<ParticleEmitter> emitters;
+	ParticleEmitter emitter;
 	ofxCurlNoise curlNoise;
 
-	ofEasyCam cam;
-
-	ofxFloatSlider speedCoeff;
+	ofxPanel curlNoisePanel;
+	ofxPanel emitterPanel;
+	ofxToggle bMouse;
 	ofxLabel fps;
-	ofxPanel gui;
 
 	public:
 		void setup();
