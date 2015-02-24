@@ -8,7 +8,7 @@
 
 class ofApp : public ofBaseApp{
 
-	ParticleEmitter particleEmitter;
+	// ParticleEmitter particleEmitter;
 	vector<ParticleEmitter> emitters;
 	ofxCurlNoise curlNoise;
 

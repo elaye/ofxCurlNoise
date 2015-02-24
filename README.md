@@ -32,6 +32,11 @@ Compatibility
 This addon works with oF v0.9.0 and OpenGL v4.3 or higher.
 It was tested with linux and oF v0.9.0. 
 
+<!-- TODO 
+- Fix ParticleEmitter data.id problem (i.e. if we declare a ParticleEmitter that we don't use -> segfault)
+
+-->
+
 <!--Known issues
 -------------->
 

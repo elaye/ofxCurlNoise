@@ -4,10 +4,6 @@
 uint ParticleEmitter::count = 0;
 
 void ParticleEmitter::setup(){
-	pos = ofPoint(ofGetWidth()/2.0, ofGetHeight()/2.0);
-	prevPos = pos;
-	vel = ofPoint(0, 0);
-	acc = ofPoint(0, 0);
 
 	prevTime = 0.0;
 
@@ -18,25 +14,37 @@ void ParticleEmitter::setup(){
 	parameters.add(velocityVariation.set("Vel. variation", 100.0, 0.0, 100.0));
 	parameters.add(bUseEmitterVelocity.set("Use emitter vel.", true));
 	parameters.add(velocityScale.set("Velocity scale", -10.0, -100.0, 100.0));
-	parameters.add(emitterRadius.set("Radius", 3.0, 1.0, 30.0));
+	parameters.add(radius.set("Radius", 3.0, 1.0, 30.0));
 
+	data.pos = ofPoint(ofGetWidth()/2.0, ofGetHeight()/2.0);
+	data.prevPos = data.pos;
+	data.vel = ofPoint(0, 0);
+	data.acc = ofPoint(0, 0);
+
+	data.radius = radius;
+	data.velocityScale = velocityScale;
+	data.averageLifespan = averageLifespan;
+	data.lifespanVariation = lifespanVariation;
+	data.averageVelocity = averageVelocity;
+	data.velocityVariation = velocityVariation;
+	data.useEmitterVelocity = bUseEmitterVelocity;
 }
 
 void ParticleEmitter::update(float x, float y){
 	float dt = ofGetElapsedTimef() - prevTime;
-	ofPoint newVel = ofPoint(pos.x - x, pos.y - y)*dt;
-	prevPos = pos;
-	pos = ofPoint(x, y);
-	acc.x = (vel.x - newVel.x)*dt;
-	acc.y = (vel.y - newVel.y)*dt;
-	vel = newVel;
+	ofPoint newVel = ofPoint(data.pos.x - x, data.pos.y - y)*dt;
+	data.prevPos = data.pos;
+	data.pos = ofPoint(x, y);
+	data.acc.x = (data.vel.x - newVel.x)*dt;
+	data.acc.y = (data.vel.y - newVel.y)*dt;
+	data.vel = newVel;
 	prevTime = ofGetElapsedTimef();
 	// ofLog() << "id:" << id;
-	ofNotifyEvent(updated, *this, this);
+	ofNotifyEvent(updated, data, this);
 }
 
 void ParticleEmitter::draw(){
 	ofSetColor(ofColor::red);
 	ofFill();
-	ofDrawCircle(pos, 10);
+	ofDrawCircle(data.pos, 10);
 }
