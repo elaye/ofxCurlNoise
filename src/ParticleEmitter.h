@@ -7,13 +7,13 @@ struct EmitterData{
 	ofVec4f vel;
 	ofVec4f acc;
 	ofVec4f prevPos;
-	float radius;
-	float velocityScale;
-	float averageLifespan;
-	float lifespanVariation;
-	float averageVelocity;
-	float velocityVariation;
-	float useEmitterVelocity;
+	ofParameter<float> radius;
+	ofParameter<float> velocityScale;
+	ofParameter<float> averageLifespan;
+	ofParameter<float> lifespanVariation;
+	ofParameter<float> averageVelocity;
+	ofParameter<float> velocityVariation;
+	ofParameter<bool> bUseEmitterVelocity;
 	int id;
 };
 
@@ -26,11 +26,11 @@ class ParticleEmitter{
 
 	float prevTime;
 
-	ofParameter<float> radius, 
-						averageLifespan, lifespanVariation, 
-						averageVelocity, velocityVariation, velocityScale;
+	// ofParameter<float> radius, 
+	// 					averageLifespan, lifespanVariation, 
+	// 					averageVelocity, velocityVariation, velocityScale;
 
-	ofParameter<bool> bUseEmitterVelocity;
+	// ofParameter<bool> bUseEmitterVelocity;
 
 	public:
 		ofEvent<EmitterData> updated;
