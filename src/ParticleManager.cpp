@@ -30,13 +30,16 @@ void ParticleManager::update(){
 		for(uint i = 0; i < emittersData.size(); ++i){
 			string is = ofToString(i);
 			EmitterData& e(emittersData[i]);
+			ofVec4f rot = e.velRotFromZ.asVec4();
 			shader.setUniform4f("e["+is+"].pos", e.pos.x, e.pos.y, e.pos.z, e.pos.w);
 			shader.setUniform4f("e["+is+"].vel", e.vel.x, e.vel.y, e.vel.z, e.vel.w);
 			shader.setUniform4f("e["+is+"].acc", e.acc.x, e.acc.y, e.acc.z, e.acc.w);
 			shader.setUniform4f("e["+is+"].prevPos", e.prevPos.x, e.prevPos.y, e.prevPos.z, e.prevPos.w);
+			shader.setUniform4f("e["+is+"].velRotFromZ", rot.x, rot.y, rot.z, rot.w);
 			shader.setUniform1f("e["+is+"].radius", e.radius);
 			shader.setUniform1f("e["+is+"].averageLifespan", e.averageLifespan);
 			shader.setUniform1f("e["+is+"].lifespanVariation", e.lifespanVariation);
+			shader.setUniform1f("e["+is+"].velocityAngle", e.velocityAngle);
 			shader.setUniform1f("e["+is+"].averageVelocity", e.averageVelocity);
 			shader.setUniform1f("e["+is+"].velocityScale", e.velocityScale);
 			shader.setUniform1f("e["+is+"].velocityVariation", e.velocityVariation);
@@ -72,10 +75,12 @@ void ParticleManager::loadShader(){
 			vec4 vel;
 			vec4 acc;
 			vec4 prevPos;
+			vec4 velRotFromZ;
 			float radius;
 			float velocityScale;
 			float averageLifespan;
 			float lifespanVariation;
+			float velocityAngle;
 			float averageVelocity;
 			float velocityVariation;
 			float useEmitterVelocity;
@@ -112,6 +117,13 @@ void ParticleManager::loadShader(){
 			return randNum;
 		}
 
+		// Rotate a vec3 using a quaternion
+		vec3 rotate(vec3 v, vec4 q){
+			// vec3 temp = cross(q.xyz, v) + q.w * v;
+			// return (cross(temp, -q.xyz) + dot(q.xyz,v) * q.xyz + q.w * temp);
+			return v + 2.0 * cross( cross( v, q.xyz ) + q.w * v, q.xyz );			
+		}
+
 		// Random lifespan based on emitter's parameters
 		float newLifespan(Emitter em){
 			float var = rand(-em.lifespanVariation, em.lifespanVariation)/100.0;
@@ -137,19 +149,35 @@ void ParticleManager::loadShader(){
 		}
 
 		// Random velocity based on emitter's parameters
+		// vec4 newVelocity(Emitter em){
+		// 	float theta = rand(0.0, 2*M_PI);
+		// 	float velNorm = em.averageVelocity*(1.0 + rand(-em.velocityVariation, em.velocityVariation)/100.0);
+		// 	float vx = velNorm*cos(theta);
+		// 	float vy = velNorm*sin(theta);
+		// 	vec3 newVel;
+		// 	if(em.useEmitterVelocity > 0.0){
+		// 		newVel.xy = em.vel.xy*em.velocityScale + vec2(vx, vy);
+		// 	}
+		// 	else{
+		// 		newVel.xy = -normalize(em.vel.xy) * vec2(vx, vy);
+		// 	}
+		// 	return vec4(newVel.xy, 0.0, 1.0);
+		// }
+
+		// Random velocity in a cone based on emitter's parameters
 		vec4 newVelocity(Emitter em){
-			float theta = rand(0.0, 2*M_PI);
-			float velNorm = em.averageVelocity*(1.0 + rand(-em.velocityVariation, em.velocityVariation)/100.0);
-			float vx = velNorm*cos(theta);
-			float vy = velNorm*sin(theta);
-			vec3 newVel;
+			float phi = rand(0, 2*M_PI);
+			float nz = rand(cos(em.velocityAngle), 1.0);
+			float nx = sqrt(1-nz*nz)*cos(phi);
+			float ny = sqrt(1-nz*nz)*sin(phi);
+			vec3 velDir = rotate(vec3(nx, ny, nz), em.velRotFromZ);
+			float velNorm = em.averageVelocity*(1.0 + rand(-em.velocityVariation, em.velocityVariation)/100.0);			
+			vec3 newVel = velDir*velNorm;
+			// newVel *= em.velocityScale;
 			if(em.useEmitterVelocity > 0.0){
-				newVel.xy = em.vel.xy*em.velocityScale + vec2(vx, vy);
+				newVel += em.vel.xyz*em.velocityScale;
 			}
-			else{
-				newVel.xy = -normalize(em.vel.xy) * vec2(vx, vy);
-			}
-			return vec4(newVel.xy, 0.0, 1.0);
+			return vec4(newVel.xyz, 1.0);
 		}
 
 		// Respawn particle p[gid] at a random emitter position
@@ -159,6 +187,7 @@ void ParticleManager::loadShader(){
 
 			p[gid].lifespan.x = newLifespan(em);
 			p[gid].pos = newPosition(em);
+			// p[gid].pos = vec4(0.0, 0.0, 0.0, 1.0);
 			p[gid].vel = newVelocity(em);
 			p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
 		}

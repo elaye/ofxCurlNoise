@@ -7,7 +7,9 @@ struct EmitterData{
 	ofVec4f vel;
 	ofVec4f acc;
 	ofVec4f prevPos;
+	ofQuaternion velRotFromZ;
 	ofParameter<float> radius;
+	ofParameter<float> velocityAngle;
 	ofParameter<float> velocityScale;
 	ofParameter<float> averageLifespan;
 	ofParameter<float> lifespanVariation;

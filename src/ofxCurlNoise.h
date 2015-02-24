@@ -13,6 +13,8 @@ class ofxCurlNoise {
 
 	ofVbo particlesVbo;
 
+	ofParameter<bool> bCurlNoise;
+
 	public:
 		ofParameterGroup parameters;
 		void setup(ParticleEmitter& emitter, int n);

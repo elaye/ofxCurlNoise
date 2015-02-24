@@ -16,19 +16,20 @@ void ofxCurlNoise::setup(vector<ParticleEmitter>& emitters, int n){
 
 void ofxCurlNoise::setup(int k, int n){
 	particleManager.setup(k, n);
-	// ofAddListener(ParticleEmitter::updated, &particleManager, &ParticleManager::updateEmitter);
 
 	curlNoise.setup(n);
 
 	particlesVbo = ofVbo(particleManager.getVbo());
 
+	parameters.add(bCurlNoise.set("Curl noise", true));
 	parameters.add(curlNoise.parameters);
-	// parameters.add(particleManager.parameters);
 }
 
 void ofxCurlNoise::update(){
 	particleManager.update();
-	curlNoise.update();
+	if(bCurlNoise){
+		curlNoise.update();
+	}
 }
 
 void ofxCurlNoise::draw(){
