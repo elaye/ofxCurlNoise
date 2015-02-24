@@ -40,7 +40,7 @@ void ParticleManager::update(){
 			shader.setUniform1f("e["+is+"].averageVelocity", e.averageVelocity);
 			shader.setUniform1f("e["+is+"].velocityScale", e.velocityScale);
 			shader.setUniform1f("e["+is+"].velocityVariation", e.velocityVariation);
-			shader.setUniform1f("e["+is+"].useEmitterVelocity", e.useEmitterVelocity);
+			shader.setUniform1f("e["+is+"].useEmitterVelocity", (e.bUseEmitterVelocity)? 1.0 : -1.0);
 			shader.setUniform1i("e["+is+"].id", e.id);
 		}
 		shader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
@@ -121,13 +121,18 @@ void ParticleManager::loadShader(){
 		// Random position based on emitter's parameters
 		vec4 newPosition(Emitter em){
 			float theta = rand(0.0, 2*M_PI);
-			float r = rand(0.0, em.radius);
-			float x = r*cos(theta);
-			float y = r*sin(theta);
+			// float r = rand(0.0, em.radius);
+			// float x = r*cos(theta);
+			// float y = r*sin(theta);
+			// Uniform random point on sphere
+			float u = rand(-1.0, 1.0);
+			float x = em.radius*sqrt(1.0-u*u)*cos(theta);
+			float y = em.radius*sqrt(1.0-u*u)*sin(theta);
+			float z = em.radius*u;
+			// float z = 0.0;
 			vec3 intPos = mix(em.pos.xyz, em.prevPos.xyz, rand(0.0, 1.0));
-			vec3 newPos = intPos + vec3(x, y, 0.0);
+			vec3 newPos = intPos + vec3(x, y, z);
 			// vec2 newPos = mix(e[1].pos.xy, em.prevPos.xy, rand(0.0, 1.0));
-			// float a = vec2(0.0);
 			return vec4(newPos, 1.0);
 		}
 
