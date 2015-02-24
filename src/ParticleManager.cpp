@@ -90,6 +90,7 @@ void ParticleManager::loadShader(){
 
 		uint rng_state;
 
+		// Random float number between 0.0 and 1.0
 		float rand_xorshift(){
 			// Xorshift algorithm from George Marsaglia's paper
 			rng_state ^= (rng_state << 13);
@@ -99,6 +100,7 @@ void ParticleManager::loadShader(){
 			return r;
 		}
 
+		// Random number between min(x, y) and max(x, y)
 		float rand(float x, float y){
 			float high = 0;
 			float low = 0;
@@ -110,33 +112,54 @@ void ParticleManager::loadShader(){
 			return randNum;
 		}
 
+		// Random lifespan based on emitter's parameters
+		float newLifespan(Emitter em){
+			float var = rand(-em.lifespanVariation, em.lifespanVariation)/100.0;
+			return em.averageLifespan*(1.0 + var);
+		}
+
+		// Random position based on emitter's parameters
+		vec4 newPosition(Emitter em){
+			float theta = rand(0.0, 2*M_PI);
+			float r = rand(0.0, em.radius);
+			float x = r*cos(theta);
+			float y = r*sin(theta);
+			vec3 intPos = mix(em.pos.xyz, em.prevPos.xyz, rand(0.0, 1.0));
+			vec3 newPos = intPos + vec3(x, y, 0.0);
+			// vec2 newPos = mix(e[1].pos.xy, em.prevPos.xy, rand(0.0, 1.0));
+			// float a = vec2(0.0);
+			return vec4(newPos, 1.0);
+		}
+
+		// Random velocity based on emitter's parameters
+		vec4 newVelocity(Emitter em){
+			float theta = rand(0.0, 2*M_PI);
+			float velNorm = em.averageVelocity*(1.0 + rand(-em.velocityVariation, em.velocityVariation)/100.0);
+			float vx = velNorm*cos(theta);
+			float vy = velNorm*sin(theta);
+			vec3 newVel;
+			if(em.useEmitterVelocity > 0.0){
+				newVel.xy = em.vel.xy*em.velocityScale + vec2(vx, vy);
+			}
+			else{
+				newVel.xy = -normalize(em.vel.xy) * vec2(vx, vy);
+			}
+			return vec4(newVel.xy, 0.0, 1.0);
+		}
+
+		// Respawn particle p[gid] at a random emitter position
 		void respawn(uint gid){
 			uint id = rng_state % EMITTERS_NB;
 			Emitter em = e[id];
 
-			float theta = rand(0.0, 2*M_PI);
-			float r = rand(0.0, em.radius.x);
-			float x = r*cos(theta);
-			float y = r*sin(theta);
-			vec2 newPos = mix(em.pos.xy, em.prevPos.xy, rand(0.0, 1.0));
-			// vec2 newPos = mix(e[1].pos.xy, em.prevPos.xy, rand(0.0, 1.0));
-			p[gid].pos = vec4(newPos+vec2(x, y), 0.0, 1.0);
-			float velNorm = em.averageVelocity*(1.0 + rand(-em.velocityVariation, em.velocityVariation)/100.0);
-			float vx = velNorm*cos(theta);
-			float vy = velNorm*sin(theta);
-			if(em.useEmitterVelocity > 0.0){
-				p[gid].vel = vec4(em.vel.xy*em.velocityScale + vec2(vx, vy), 0.0, 1.0);
-			}
-			else{
-				p[gid].vel = vec4(-normalize(em.vel.xy)*vec2(vx, vy), 0.0, 1.0);
-			}
+			p[gid].lifespan.x = newLifespan(em);
+			p[gid].pos = newPosition(em);
+			p[gid].vel = newVelocity(em);
 			p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
-			p[gid].lifespan.x = em.averageLifespan*(1.0 + rand(-em.lifespanVariation, em.lifespanVariation)/100.0);
 		}
 
 		void main(){
 			uint gid = gl_GlobalInvocationID.x;
-			// rng_state = uint(floor(p[gid].pos.x*p[gid].pos.y*1000))*gid;
 			rng_state = gid;
 
 			p[gid].lifespan.x -= 1.0;

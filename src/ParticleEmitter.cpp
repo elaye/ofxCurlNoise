@@ -29,13 +29,15 @@ void ParticleEmitter::setup(){
 	data.useEmitterVelocity = bUseEmitterVelocity;
 }
 
-void ParticleEmitter::update(float x, float y){
+void ParticleEmitter::update(float x, float y, float z){
 	float dt = ofGetElapsedTimef() - prevTime;
-	ofPoint newVel = ofPoint(data.pos.x - x, data.pos.y - y)*dt;
+	// ofPoint newVel = ofPoint(data.pos.x - x, data.pos.y - y)*dt;
+	ofPoint newVel = (data.pos - ofPoint(x, y, z))*dt;
 	data.prevPos = data.pos;
 	data.pos = ofPoint(x, y);
-	data.acc.x = (data.vel.x - newVel.x)*dt;
-	data.acc.y = (data.vel.y - newVel.y)*dt;
+	// data.acc.x = (data.vel.x - newVel.x)*dt;
+	// data.acc.y = (data.vel.y - newVel.y)*dt;
+	data.acc = (data.vel - newVel)*dt;
 	data.vel = newVel;
 	prevTime = ofGetElapsedTimef();
 	ofNotifyEvent(updated, data, this);

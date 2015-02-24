@@ -39,7 +39,7 @@ class ParticleEmitter{
 		ParticleEmitter(){ data.id = count; ++count; }
 		// ~ParticleEmitter(){ --count; }
 		void setup();
-		void update(float x, float y);
+		void update(float x, float y, float z = 0.0);
 		void draw();
 
 		int getId() { return id; }
