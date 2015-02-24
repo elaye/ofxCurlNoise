@@ -1,6 +1,5 @@
 #include "ParticleEmitter.h"
 
-// ofEvent<ParticleEmitter> ParticleEmitter::updated = ofEvent<ParticleEmitter>();
 uint ParticleEmitter::count = 0;
 
 void ParticleEmitter::setup(){
@@ -39,7 +38,6 @@ void ParticleEmitter::update(float x, float y){
 	data.acc.y = (data.vel.y - newVel.y)*dt;
 	data.vel = newVel;
 	prevTime = ofGetElapsedTimef();
-	// ofLog() << "id:" << id;
 	ofNotifyEvent(updated, data, this);
 }
 

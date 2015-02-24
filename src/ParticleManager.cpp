@@ -1,7 +1,6 @@
 #include "ParticleManager.h"
 
 void ParticleManager::setup(int k, int n){
-	// emittersNb = k;
 	emittersData.resize(k);
 	particles.resize(n);
 
@@ -9,24 +8,11 @@ void ParticleManager::setup(int k, int n){
 
 	particlesBuffer.allocate(particles, GL_STATIC_DRAW);
 	particlesBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 0);
-	
-	// emittersBuffer.allocate(vector<Emitter>(begin(emitters), end(emitters)), GL_DYNAMIC_DRAW);
-	// emittersBuffer.allocate(getEmittersData(), GL_DYNAMIC_DRAW);
-	// emittersBuffer.allocate(emittersNb*sizeof(Emitter), GL_DYNAMIC_DRAW);
-	// vector<Emitter> emitters = {ParticleEmitter().getData(), ParticleEmitter().getData()};
-	// emittersBuffer.allocate(emitters, GL_DYNAMIC_DRAW);
-	// emittersBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 1);
 
 	vbo.setVertexBuffer(particlesBuffer, 4, sizeof(Particle));
 
-	// ofLog() << sizeof(Emitter);
-
 	loadShader();	
 }
-
-// void ParticleManager::addEmitter(ParticleEmitter* emitter){
-// 	emitters.push_back(emitter);
-// }
 
 void ParticleManager::initParticles(){
 	for(uint i = 0; i < particles.size(); ++i){
@@ -57,34 +43,12 @@ void ParticleManager::update(){
 			shader.setUniform1f("e["+is+"].useEmitterVelocity", e.useEmitterVelocity);
 			shader.setUniform1i("e["+is+"].id", e.id);
 		}
-		// shader.setUniform2f("emitterPrevPos", prevPos.x, prevPos.y);
-		// shader.setUniform2f("emitterPos", pos.x, pos.y);
-		// shader.setUniform2f("emitterVel", vel.x, vel.y);
-		// shader.setUniform1f("emitterRadius", emitterRadius);
-		// shader.setUniform1f("averageLifespan", averageLifespan);
-		// shader.setUniform1f("lifespanVariation", lifespanVariation);
-		// shader.setUniform1f("averageVelocity", averageVelocity);
-		// shader.setUniform1f("velocityVariation", velocityVariation);
-		// shader.setUniform1f("useEmitterVelocity", (bUseEmitterVelocity)? 1.0 : -1.0);
-		// shader.setUniform1f("velocityScale", velocityScale);
-		// shader.setUniform1i("emittersNb", emittersData.size());
 		shader.dispatchCompute(particles.size()/WORK_GROUP_SIZE, 1, 1);
 	shader.end();	
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 
 void ParticleManager::updateEmitter(EmitterData& emitterData){
-	// ofLog() << emitter.getId();
-	// Emitter data[1] = {emitter.getData()};
-	// ofLog() << data[0].pos;
-	// emittersBuffer.updateData(emitter.getId()*sizeof(Emitter), sizeof(Emitter), data);
-	// vector<Emitter> data = {emitter.getData()};
-	// ofLog() << emitter.getId()*sizeof(Emitter);
-	// emittersBuffer.updateData(emitter.getId()*sizeof(Emitter), data);
-
-	// Emitter* em = emittersBuffer.map<Emitter>(GL_READ_ONLY);
-	// 	ofLog() << (em->pos == data[0].pos);
-	// emittersBuffer.unmap();
 	emittersData[emitterData.id] = emitterData;
 }
 
@@ -116,31 +80,13 @@ void ParticleManager::loadShader(){
 			float velocityVariation;
 			float useEmitterVelocity;
 			int id;
-			// vec4 lifespan;
-			// vec4 velParam;
-			// vec4 radius;
 		};
 
 		layout(std430, binding=0) buffer particles{
 			Particle p[];
 		};
-
-		// layout(std430, binding=1) buffer emitters{
-		// 	Emitter e[];
-		// };		
+		
 		uniform Emitter e[EMITTERS_NB];
-		// uniform int emittersNb;
-
-		// uniform vec2 emitterPrevPos;
-		// uniform vec2 emitterPos;
-		// uniform vec2 emitterVel;
-		// uniform float emitterRadius;
-		// uniform float averageLifespan;
-		// uniform float lifespanVariation;
-		// uniform float averageVelocity;
-		// uniform float velocityVariation;
-		// uniform float useEmitterVelocity;
-		// uniform float velocityScale;
 
 		uint rng_state;
 
@@ -166,9 +112,8 @@ void ParticleManager::loadShader(){
 
 		void respawn(uint gid){
 			uint id = rng_state % EMITTERS_NB;
-			// id = 1;
 			Emitter em = e[id];
-			// em = e[0];
+
 			float theta = rand(0.0, 2*M_PI);
 			float r = rand(0.0, em.radius.x);
 			float x = r*cos(theta);

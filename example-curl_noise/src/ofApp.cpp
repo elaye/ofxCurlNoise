@@ -43,14 +43,16 @@ void ofApp::draw(){
 	ofBackground(ofColor::black);
 	ofEnableBlendMode(OF_BLENDMODE_ADD);
 	
-	ofPushMatrix();
-		ofTranslate(ofGetWidth()/2.0, ofGetHeight()/2.0);	
+	cam.begin();
+	// ofPushMatrix();
+		// ofTranslate(ofGetWidth()/2.0, ofGetHeight()/2.0);	
 		ofSetColor(ofColor(100, 1, 1, 50));
 		curlNoise.draw();
 		// particleEmitter.draw();
 		// emitters[0].draw();
 		// emitters[1].draw();
-	ofPopMatrix();
+	// ofPopMatrix();
+	cam.end();
 	
 	gui.draw();
 }
