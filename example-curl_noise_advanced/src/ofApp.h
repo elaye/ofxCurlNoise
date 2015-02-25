@@ -8,21 +8,20 @@
 
 class ofApp : public ofBaseApp{
 
-	vector<ParticleEmitter> particleEmitters;
+	vector<ParticleEmitter> emitters;
 	ofxCurlNoise curlNoise;
-	ofVbo particlesVbo;
+
+	ofxPanel curlNoisePanel;
+	ofxPanel emitterPanel;
+	ofxLabel fps;
 
 	ofShader renderShader;
-
 	ofEasyCam cam;
-
-	ofxFloatSlider speedCoeff;
-	ofxLabel fps;
-	ofxPanel gui;
 
 	public:
 		void setup();
 		void update();
+		void updateEmitter(int i);
 		void draw();
 		
 };

@@ -18,6 +18,8 @@ class CurlNoise{
 		void setup(int n);
 		void update();
 
+		void setTurbulence(float t){ turbulence = t; }
+
 	private:
 		void loadShader();
 		string getNoiseShaderFunctions();

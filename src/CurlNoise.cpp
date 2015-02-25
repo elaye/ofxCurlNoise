@@ -27,6 +27,7 @@ void CurlNoise::update(){
 		curlNoiseShader.setUniform1f("persistence", turbulence);
 		curlNoiseShader.dispatchCompute(particlesNumber/WORK_GROUP_SIZE, 1, 1);
 	curlNoiseShader.end();
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 
 void CurlNoise::loadShader(){
@@ -42,13 +43,21 @@ void CurlNoise::loadShader(){
 		    vec4 pos;
 		    vec4 vel;
 		    vec4 acc;
-		    vec4 lifespan;
+		    // vec4 lifespan;
 		};
 
 		layout(std430, binding=0) buffer particles{
 			Particle p[];
-		};		
+		};
+
+		// layout(std430, binding=1) buffer lifespans{
+		// 	float lifespan[];
+		// };		
 		
+		// layout(std430, binding=2) buffer emitterIds{
+		// 	int emitterId[];
+		// };
+
 		uniform float time;
 		uniform float persistence;
 

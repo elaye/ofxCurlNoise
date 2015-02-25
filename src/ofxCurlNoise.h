@@ -11,7 +11,7 @@ class ofxCurlNoise {
 	ParticleManager particleManager;
 	CurlNoise curlNoise;
 
-	ofVbo particlesVbo;
+	// ofVbo particlesVbo;
 
 	ofParameter<bool> bCurlNoise;
 
@@ -22,7 +22,11 @@ class ofxCurlNoise {
 		void update();
 		void draw();
 
-		ofVbo& getParticleBuffer(){ return particlesVbo; }
+		void setAttributes(ofShader& renderShader);
+
+		ofVbo& getParticleBuffer(){ return particleManager.getVbo(); }
+
+		void setTurbulence(float t){ curlNoise.setTurbulence(t); }
 
 	private:
 		void setup(int k, int n);

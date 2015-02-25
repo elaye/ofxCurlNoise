@@ -19,10 +19,15 @@ void ofxCurlNoise::setup(int k, int n){
 
 	curlNoise.setup(n);
 
-	particlesVbo = ofVbo(particleManager.getVbo());
+	// particlesVbo = ofVbo(particleManager.getVbo());
 
 	parameters.add(bCurlNoise.set("Curl noise", true));
 	parameters.add(curlNoise.parameters);
+}
+
+void ofxCurlNoise::setAttributes(ofShader& renderShader){
+	particleManager.setAttributes(renderShader);
+	// particlesVbo = ofVbo(particleManager.getVbo());
 }
 
 void ofxCurlNoise::update(){
@@ -33,5 +38,7 @@ void ofxCurlNoise::update(){
 }
 
 void ofxCurlNoise::draw(){
-	particlesVbo.draw(GL_POINTS, 0, particlesVbo.getNumVertices());	
+	// ofVbo particlesVbo(particleManager.getVbo());
+	// particlesVbo.draw(GL_POINTS, 0, particlesVbo.getNumVertices());
+	particleManager.draw();	
 }

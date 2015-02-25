@@ -11,7 +11,7 @@ struct Particle {
 	ofVec4f pos;
 	ofVec4f vel;
 	ofVec4f acc;
-	ofVec4f lifespan;
+	// ofVec4f lifespan;
 };
 
 class ParticleManager{
@@ -19,7 +19,7 @@ class ParticleManager{
 	vector<EmitterData> emittersData;
 
 	vector<Particle> particles;
-	ofBufferObject particlesBuffer;
+	ofBufferObject particlesBuffer, lifespanBuffer, emitterIdBuffer;
 
 	ofVbo vbo;
 
@@ -29,6 +29,9 @@ class ParticleManager{
 		void setup(int k, int n);
 		void update();
 		void updateEmitter(EmitterData& emitterData);
+		void draw();
+
+		void setAttributes(ofShader& renderShader);
 
 		ofVbo& getVbo(){ return vbo; }
 

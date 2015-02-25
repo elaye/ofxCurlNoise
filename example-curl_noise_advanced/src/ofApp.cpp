@@ -4,53 +4,66 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofSetFrameRate(60);
 
-	ParticleEmitter emitter;
-	emitter.setup();
-	particleEmitters.push_back(emitter);
-	curlNoise.setup(particleEmitters, 1024*256);
+	// Create 3 particle emitters 
+	emitters = {ParticleEmitter(), ParticleEmitter(), ParticleEmitter()};
+	// Setup the particle emitters
+	for(auto& e : emitters){ e.setup();	}
 
-	particlesVbo = curlNoise.getParticleBuffer();
-
-	gui.setup(curlNoise.parameters);
-	gui.add(speedCoeff.setup("Speed", 2.0, 0.1, 5.0));
-	gui.add(fps.setup("Fps:", ""));
+	// Setup the curl noise, pass the emitter and 
+	// the number of particles we want
+	curlNoise.setup(emitters, 1024*256);
+	curlNoise.setTurbulence(0.3);
 
 	renderShader.load("shaders/render_vert.glsl", "shaders/render_frag.glsl");
+	curlNoise.setAttributes(renderShader);
+	// Add 'lifespan' and 'emitterId' attributes to the particle vbo
+	// See the shaders for how to use these
+
+	// Setup gui
+	// emitterPanel.setup(emitter.parameters);
+	// emitterPanel.add(bMouse.setup("Mouse", false));
+	
+	curlNoisePanel.setup(curlNoise.parameters);
+	curlNoisePanel.add(fps.setup("Fps:", ""));
+	curlNoisePanel.setPosition(emitterPanel.getWidth()+20, emitterPanel.getPosition().y);
+
 }
 
 void ofApp::update(){
 	fps = ofToString(ofGetFrameRate());
-	// curlNoise.update(ofGetMouseX()-ofGetWidth()/2.0, ofGetMouseY()-ofGetHeight()/2.0);
-	float t = ofGetElapsedTimef()*speedCoeff;
-	float a = 300;
-	float x = a*cos(t)/(1+sin(t)*sin(t));
-	float y = a*sin(t)*cos(t)/(1+sin(t)*sin(t));
-	// float x = 16*sin(t)*sin(t)*sin(t);
-	// float y = 13*cos(t)-5*cos(2*t)-2*cos(3*t)-4*cos(4*t);
-	// particleEmitter.update(x, y);
-	particleEmitters[0].update(x, y);
-	// ofLog() << particleEmitters[0].getPos();
-
+	
+	for(uint i = 0; i < emitters.size(); ++i){
+		updateEmitter(i);
+	}
+	// Update curl noise
 	curlNoise.update();
 }
 
+void ofApp::updateEmitter(int i){
+	float t = ofGetElapsedTimef();
+	// float r = (i+1)*50;
+	float r = 150.0;
+	float phi = M_PI/2.0;
+	float theta = t + 4*M_PI*i/float(emitters.size());
+	float x = r*cos(theta)*sin(phi) + r/2.0*cos(2*M_PI*i/float(emitters.size()));
+	float y = r*sin(theta)*sin(phi) + r/2.0*sin(2*M_PI*i/float(emitters.size()));
+	float z = r*cos(phi);
+	emitters[i].update(x, y, z);
+}
+
 void ofApp::draw(){
-	ofBackground(ofColor::black);
-	ofEnableBlendMode(OF_BLENDMODE_ADD);
+	ofBackground(ofColor::lightGrey);
+	ofEnableAlphaBlending();
+	ofSetColor(ofColor(100, 1, 1, 50));
 	
-	ofPushMatrix();
-		ofTranslate(ofGetWidth()/2.0, ofGetHeight()/2.0);	
-		ofSetColor(ofColor(100, 1, 1, 50));
-	// cam.begin();
-		// For render shader example
-		// particlesVbo.draw(GL_POINTS, 0, particlesVbo.getNumVertices());
+	cam.begin();
+		// Draw particles
 		renderShader.begin();
 			curlNoise.draw();
 		renderShader.end();
-	// cam.end();
-		// particleEmitter.draw();
-		// particleEmitters[0].draw();
-	ofPopMatrix();
-	
-	gui.draw();
+	cam.end();
+
+	// Draw GUI
+	curlNoisePanel.draw();
+	// emitterPanel.draw();
 }
