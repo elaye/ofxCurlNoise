@@ -5,21 +5,63 @@ ofxCurlNoise
 
 Introduction
 ------------
-Describe what your addon is about
+
+**!!! WARNING:** this addon uses oF v0.9.0, that is still in development.
+
+This addon provides a particle system with a curl noise. 
+
+The code for the curl noise comes from [dli/flow](https://github.com/dli/flow).
 
 Installation
 ------------
+
 Just copy the `ofxCurlNoise` folder into your `openFrameworks/addons/` folder.
 
 Usage
 -----
 
+You first have to set the OpenGL version to 4.3 in the `main.cpp` of your project before using this addon. You can look at one of the examples to see how to do it.
+
+First, you need to create and initialize a `ParticleEmitter`.
+After this, you can initialize the particle system with the initialized emitter and a number of particles for your particle system. For the moment, it works well only with a number of particles that is a **power of 2**. Here is how your `ofApp::setup()` should look like:
+
+    void ofApp::setup(){
+    	emitter.setup();
+    	curlNoise.setup(emitter, 1024*256);
+    }
+
+Then you update the position of your particle emitter and the particle system.
+
+    void ofApp::update(){
+    	float x = ...;
+    	float y = ...;
+    	emitter.update(x, y);
+    	curlNoise.update();
+    }
+
+Finally you draw the particles.
+
+    void ofApp::draw(){
+    	curlNoise.draw(;)
+    }
+
+You can use multiple particle emitters. To do this, initialize the particle system with a `vector<ParticleEmitter>` (see advanced example).
+
+You can set the turbulence coefficient of the curl noise programmatically by calling `ofxCurlNoise::setTurbulence(float t)`.
+
+The parameters of the emitter is accessible via `ParticleEmitter::parameters` (see examples).
+
 Examples
 --------
 
 <div align="center">
-	<img src="curl_noise.png" alt="Curl noise">
+	<img src="screenshot_1.png" alt="Curl noise">
 	<em>Curl noise example</em>
+</div>
+
+<div align="center">
+	<img src="screenshot_2.png" alt="Curl noise">
+	<em>Curl noise example - Advanced</em>
 </div>
 
 Dependencies
@@ -29,8 +71,8 @@ ofxGui for the examples.
 
 Compatibility
 ------------
-This addon works with oF v0.9.0 and OpenGL v4.3 or higher.
-It was tested with linux and oF v0.9.0. 
+This addon uses oF v0.9.0 (still in development) and OpenGL v4.3 or higher.
+It was tested with linux and oF v0.9.0 (commit bb3572dd48a3d2fa5a8ccb01a0b593d8926ec7b2). 
 
 <!-- TODO 
 - Fix ParticleEmitter data.id problem (i.e. if we declare a ParticleEmitter that we don't use -> segfault)
