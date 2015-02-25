@@ -24,7 +24,6 @@ void ParticleEmitter::setup(){
 
 void ParticleEmitter::update(float x, float y, float z){
 	float dt = ofGetElapsedTimef() - prevTime;
-	// ofPoint newVel = ofPoint(data.pos.x - x, data.pos.y - y)*dt;
 	ofPoint newVel = (data.pos - ofPoint(x, y, z))*dt;
 	data.prevPos = data.pos;
 	data.pos = ofPoint(x, y, z);
