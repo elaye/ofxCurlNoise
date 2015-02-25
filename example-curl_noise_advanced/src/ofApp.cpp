@@ -49,7 +49,7 @@ void ofApp::updateEmitter(int i){
 	float theta = t + 4*M_PI*i/float(emitters.size());
 	float x = r*cos(theta) + r/2.0*cos(2*M_PI*i/float(emitters.size()));
 	float y = r*sin(theta) + r/2.0*sin(2*M_PI*i/float(emitters.size()));
-	emitters[i].update(x, y, z);
+	emitters[i].update(x, y, 0);
 }
 
 void ofApp::draw(){
