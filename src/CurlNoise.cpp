@@ -11,7 +11,6 @@ void CurlNoise::setup(int n){
 	advancedParameters.add(noisePositionScale.set("Position scale", 0.005, 0.001, 0.02));
 	advancedParameters.add(noiseTimeScale.set("Time scale", 1.0, 0.001, 2.0));
 	advancedParameters.add(noiseScale.set("Noise scale", 0.02, 0.001, 0.02));
-	// advancedParameters.add(baseSpeedScale.set("Speed scale", 2.0, 0.1, 2.0));
 
 	loadShader();
 }
@@ -21,7 +20,6 @@ void CurlNoise::update(){
 		curlNoiseShader.setUniform1f("NOISE_POSITION_SCALE", noisePositionScale);
 		curlNoiseShader.setUniform1f("NOISE_SCALE", noiseScale);
 		curlNoiseShader.setUniform1f("NOISE_TIME_SCALE", noiseTimeScale);
-		// curlNoiseShader.setUniform1f("BASE_SPEED_SCALE", baseSpeedScale);
 
 		curlNoiseShader.setUniform1f("time", ofGetElapsedTimef());
 		curlNoiseShader.setUniform1f("persistence", turbulence);
@@ -43,7 +41,6 @@ void CurlNoise::loadShader(){
 		    vec4 pos;
 		    vec4 vel;
 		    vec4 acc;
-		    // vec4 lifespan;
 		};
 
 		layout(std430, binding=0) buffer particles{
@@ -60,6 +57,10 @@ void CurlNoise::loadShader(){
 
 		uniform float time;
 		uniform float persistence;
+
+		uniform float NOISE_POSITION_SCALE;
+		uniform float NOISE_SCALE;
+		uniform float NOISE_TIME_SCALE;
 
 		const int OCTAVES = 3;
 
@@ -88,10 +89,8 @@ void CurlNoise::loadShader(){
 										xNoisePotentialDerivatives[2] - zNoisePotentialDerivatives[0],
 										yNoisePotentialDerivatives[0] - xNoisePotentialDerivatives[1]
 										) * NOISE_SCALE;
-			// vec3 velocity = vec3(BASE_SPEED_SCALE*10, 0.0, 0.0);
-			// vec3 totalVelocity = velocity + noiseVelocity;
 			vec3 totalVelocity = p[gid].vel.xyz + noiseVelocity;
-			vec3 newPosition = oldPosition + totalVelocity*0.2;// * deltaTime;
+			vec3 newPosition = oldPosition + totalVelocity*0.2;
 
 			p[gid].pos = vec4(newPosition, 1.0);
 
@@ -176,21 +175,6 @@ string CurlNoise::getNoiseShaderFunctions(){
 			return vec4(dx, dy, dz, dw) * 49.0;
 		}
 
-		// define NOISE_POSITION_SCALE 1.5
-		// define NOISE_SCALE 0.075
-		// define NOISE_TIME_SCALE 1.0/4000.0
-		// define BASE_SPEED 0.2
-
-		// define NOISE_POSITION_SCALE 0.005
-		// define NOISE_SCALE 0.005
-		// define NOISE_TIME_SCALE 1.0
-		// define BASE_SPEED 1.0
-
-		uniform float NOISE_POSITION_SCALE;
-		uniform float NOISE_SCALE;
-		uniform float NOISE_TIME_SCALE;
-		uniform float BASE_SPEED_SCALE;
-
 		vec3 mod289(vec3 x) {
 			return x - floor(x * (1.0 / 289.0)) * 289.0;
 		}
@@ -212,12 +196,7 @@ string CurlNoise::getNoiseShaderFunctions(){
 			vec2 x0 = v - i + dot(i, C.xx);
 			// Other corners
 			vec2 i1;
-			//i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
-			//i1.y = 1.0 - i1.x;
 			i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-			// x0 = x0 - 0.0 + 0.0 * C.xx ;
-			// x1 = x0 - i1 + 1.0 * C.xx ;
-			// x2 = x0 - 1.0 + 2.0 * C.xx ;
 			vec4 x12 = x0.xyxy + C.xxzz;
 			x12.xy -= i1;
 			// Permutations

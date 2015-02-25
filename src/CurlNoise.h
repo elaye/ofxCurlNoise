@@ -8,7 +8,7 @@
 class CurlNoise{
 	ofShader curlNoiseShader;
 
-	ofParameter<float> turbulence, noisePositionScale, noiseTimeScale, noiseScale;//, baseSpeedScale;
+	ofParameter<float> turbulence, noisePositionScale, noiseTimeScale, noiseScale;
 
 	int particlesNumber;
 

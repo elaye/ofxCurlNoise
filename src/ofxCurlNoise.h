@@ -17,6 +17,7 @@ class ofxCurlNoise {
 
 	public:
 		ofParameterGroup parameters;
+		ofParameterGroup advancedParameters;
 		void setup(ParticleEmitter& emitter, int n);
 		void setup(vector<ParticleEmitter>& emitters, int n);
 		void update();

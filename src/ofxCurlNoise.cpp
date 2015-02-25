@@ -20,6 +20,9 @@ void ofxCurlNoise::setup(int k, int n){
 	parameters.setName("Curl noise");
 	parameters.add(bCurlNoise.set("Enable", true));
 	parameters.add(curlNoise.parameters);
+
+	advancedParameters.setName("Curl noise");
+	advancedParameters.add(curlNoise.advancedParameters);
 }
 
 void ofxCurlNoise::setAttributes(ofShader& renderShader){
