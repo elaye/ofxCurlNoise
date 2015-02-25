@@ -7,7 +7,8 @@ struct EmitterData{
 	ofVec4f vel;
 	ofVec4f acc;
 	ofVec4f prevPos;
-	ofQuaternion velRotFromZ;
+	// ofQuaternion velRotFromZ;
+	ofQuaternion orientation;
 	ofParameter<float> radius;
 	ofParameter<float> velocityAngle;
 	ofParameter<float> velocityScale;
@@ -22,10 +23,10 @@ struct EmitterData{
 class ParticleEmitter{
 
 	static uint count;
-	int id;
 
 	EmitterData data;
 
+	ofQuaternion defaultOrientation;
 	float prevTime;
 
 	// ofParameter<float> radius, 
@@ -44,7 +45,9 @@ class ParticleEmitter{
 		void update(float x, float y, float z = 0.0);
 		void draw();
 
-		int getId() { return id; }
+		void setOrientation(ofQuaternion q){ defaultOrientation = q; }
+
+		int getId() { return data.id; }
 		const ofPoint getPos() const { return data.pos; }
 
 		// ostream& operator<<(ostream& os)

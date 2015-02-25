@@ -21,7 +21,8 @@ void ofxCurlNoise::setup(int k, int n){
 
 	// particlesVbo = ofVbo(particleManager.getVbo());
 
-	parameters.add(bCurlNoise.set("Curl noise", true));
+	parameters.setName("Curl noise");
+	parameters.add(bCurlNoise.set("Enable", true));
 	parameters.add(curlNoise.parameters);
 }
 

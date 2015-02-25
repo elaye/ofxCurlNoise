@@ -11,12 +11,13 @@ class ofApp : public ofBaseApp{
 	vector<ParticleEmitter> emitters;
 	ofxCurlNoise curlNoise;
 
-	ofxPanel curlNoisePanel;
-	ofxPanel emitterPanel;
+	ofxPanel gui;
 	ofxLabel fps;
 
 	ofShader renderShader;
 	ofEasyCam cam;
+
+	ofParameterGroup parameters;
 
 	public:
 		void setup();

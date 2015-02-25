@@ -43,12 +43,12 @@ void ParticleManager::update(){
 		for(uint i = 0; i < emittersData.size(); ++i){
 			string is = ofToString(i);
 			EmitterData& e(emittersData[i]);
-			ofVec4f rot = e.velRotFromZ.asVec4();
+			ofVec4f rot = e.orientation.asVec4();
 			shader.setUniform4f("e["+is+"].pos", e.pos.x, e.pos.y, e.pos.z, e.pos.w);
 			shader.setUniform4f("e["+is+"].vel", e.vel.x, e.vel.y, e.vel.z, e.vel.w);
 			shader.setUniform4f("e["+is+"].acc", e.acc.x, e.acc.y, e.acc.z, e.acc.w);
 			shader.setUniform4f("e["+is+"].prevPos", e.prevPos.x, e.prevPos.y, e.prevPos.z, e.prevPos.w);
-			shader.setUniform4f("e["+is+"].velRotFromZ", rot.x, rot.y, rot.z, rot.w);
+			shader.setUniform4f("e["+is+"].orientation", rot.x, rot.y, rot.z, rot.w);
 			shader.setUniform1f("e["+is+"].radius", e.radius);
 			shader.setUniform1f("e["+is+"].averageLifespan", e.averageLifespan);
 			shader.setUniform1f("e["+is+"].lifespanVariation", e.lifespanVariation);
@@ -92,7 +92,7 @@ void ParticleManager::loadShader(){
 			vec4 vel;
 			vec4 acc;
 			vec4 prevPos;
-			vec4 velRotFromZ;
+			vec4 orientation;
 			float radius;
 			float velocityScale;
 			float averageLifespan;
@@ -195,7 +195,7 @@ void ParticleManager::loadShader(){
 			float nz = rand(cos(em.velocityAngle), 1.0);
 			float nx = sqrt(1-nz*nz)*cos(phi);
 			float ny = sqrt(1-nz*nz)*sin(phi);
-			vec3 velDir = rotate(vec3(nx, ny, nz), em.velRotFromZ);
+			vec3 velDir = rotate(vec3(nx, ny, nz), em.orientation);
 			float velNorm = em.averageVelocity*(1.0 + rand(-em.velocityVariation, em.velocityVariation)/100.0);			
 			vec3 newVel = velDir*velNorm;
 			// newVel *= em.velocityScale;

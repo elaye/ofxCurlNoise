@@ -6,7 +6,7 @@ void ParticleEmitter::setup(){
 
 	prevTime = 0.0;
 
-	parameters.setName("Particle emitter " + ofToString(count));
+	parameters.setName("Particle emitter " + ofToString(data.id+1));
 	parameters.add(data.averageLifespan.set("Average lifespan", 120.0, 1.0, 3600.0));
 	parameters.add(data.lifespanVariation.set("Lifespan variation", 50.0, 0.0, 100.0));
 	parameters.add(data.velocityAngle.set("Velocity angle", M_PI/6.0, 0.0, M_PI));
@@ -31,7 +31,10 @@ void ParticleEmitter::update(float x, float y, float z){
 	data.acc = (data.vel - newVel)*dt;
 	data.vel = newVel;
 	prevTime = ofGetElapsedTimef();
-	data.velRotFromZ.makeRotate(data.vel.getNormalized(), ofVec3f(0, 0, 1));
+	// data.velRotFromZ.makeRotate(data.vel.getNormalized(), ofVec3f(0, 0, 1));
+	ofQuaternion q;
+	q.makeRotate(data.vel.getNormalized(), ofVec3f(0, 0, 1));
+	data.orientation = q*defaultOrientation;
 	ofNotifyEvent(updated, data, this);
 }
 

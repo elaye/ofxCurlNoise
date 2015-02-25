@@ -6,8 +6,13 @@ void ofApp::setup(){
 
 	// Create 3 particle emitters 
 	emitters = {ParticleEmitter(), ParticleEmitter(), ParticleEmitter()};
+	ofQuaternion q;
+	q.makeRotate(-90, 0, 0, 1);
 	// Setup the particle emitters
-	for(auto& e : emitters){ e.setup();	}
+	for(auto& e : emitters){
+		e.setup();
+		e.setOrientation(q);		
+	}
 
 	// Setup the curl noise, pass the emitter and 
 	// the number of particles we want
@@ -22,16 +27,21 @@ void ofApp::setup(){
 	// Setup gui
 	// emitterPanel.setup(emitter.parameters);
 	// emitterPanel.add(bMouse.setup("Mouse", false));
-	
-	curlNoisePanel.setup(curlNoise.parameters);
-	curlNoisePanel.add(fps.setup("Fps:", ""));
-	curlNoisePanel.setPosition(emitterPanel.getWidth()+20, emitterPanel.getPosition().y);
 
+	parameters.add(curlNoise.parameters);
+	for(auto& e : emitters){
+		parameters.add(e.parameters);
+	}
+	
+	gui.setup(parameters);
+	gui.add(fps.setup("Fps:", ""));
+	gui.minimizeAll();
 }
 
 void ofApp::update(){
 	fps = ofToString(ofGetFrameRate());
 	
+	// Update emitters' positions
 	for(uint i = 0; i < emitters.size(); ++i){
 		updateEmitter(i);
 	}
@@ -41,7 +51,6 @@ void ofApp::update(){
 
 void ofApp::updateEmitter(int i){
 	float t = ofGetElapsedTimef();
-	// float r = (i+1)*50;
 	float r = 150.0;
 	float phi = M_PI/2.0;
 	float theta = t + 4*M_PI*i/float(emitters.size());
@@ -54,8 +63,7 @@ void ofApp::updateEmitter(int i){
 void ofApp::draw(){
 	ofBackground(ofColor::lightGrey);
 	ofEnableAlphaBlending();
-	ofSetColor(ofColor(100, 1, 1, 50));
-	
+
 	cam.begin();
 		// Draw particles
 		renderShader.begin();
@@ -64,6 +72,5 @@ void ofApp::draw(){
 	cam.end();
 
 	// Draw GUI
-	curlNoisePanel.draw();
-	// emitterPanel.draw();
+	gui.draw();
 }
