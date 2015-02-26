@@ -1,7 +1,7 @@
 ofxCurlNoise
 ============
 
-![Curl noise](ofxaddons_thumbnail.png)
+![Curl noise](header.png)
 
 Introduction
 ------------
