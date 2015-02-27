@@ -84,7 +84,6 @@ void ParticleManager::loadShader(){
 		    vec4 pos;
 		    vec4 vel;
 		    vec4 acc;
-		    // vec4 lifespan;
 		};
 
 		struct Emitter{
@@ -144,8 +143,6 @@ void ParticleManager::loadShader(){
 
 		// Rotate a vec3 using a quaternion
 		vec3 rotate(vec3 v, vec4 q){
-			// vec3 temp = cross(q.xyz, v) + q.w * v;
-			// return (cross(temp, -q.xyz) + dot(q.xyz,v) * q.xyz + q.w * temp);
 			return v + 2.0 * cross( cross( v, q.xyz ) + q.w * v, q.xyz );			
 		}
 
@@ -158,9 +155,6 @@ void ParticleManager::loadShader(){
 		// Random position based on emitter's parameters
 		vec4 newPosition(Emitter em){
 			float theta = rand(0.0, 2*M_PI);
-			// float r = rand(0.0, em.radius);
-			// float x = r*cos(theta);
-			// float y = r*sin(theta);
 			// Uniform random point on sphere
 			float u = rand(-1.0, 1.0);
 			float x = em.radius*sqrt(1.0-u*u)*cos(theta);
@@ -169,25 +163,8 @@ void ParticleManager::loadShader(){
 			// float z = 0.0;
 			vec3 intPos = mix(em.pos.xyz, em.prevPos.xyz, rand(0.0, 1.0));
 			vec3 newPos = intPos + vec3(x, y, z);
-			// vec2 newPos = mix(e[1].pos.xy, em.prevPos.xy, rand(0.0, 1.0));
 			return vec4(newPos, 1.0);
 		}
-
-		// Random velocity based on emitter's parameters
-		// vec4 newVelocity(Emitter em){
-		// 	float theta = rand(0.0, 2*M_PI);
-		// 	float velNorm = em.averageVelocity*(1.0 + rand(-em.velocityVariation, em.velocityVariation)/100.0);
-		// 	float vx = velNorm*cos(theta);
-		// 	float vy = velNorm*sin(theta);
-		// 	vec3 newVel;
-		// 	if(em.useEmitterVelocity > 0.0){
-		// 		newVel.xy = em.vel.xy*em.velocityScale + vec2(vx, vy);
-		// 	}
-		// 	else{
-		// 		newVel.xy = -normalize(em.vel.xy) * vec2(vx, vy);
-		// 	}
-		// 	return vec4(newVel.xy, 0.0, 1.0);
-		// }
 
 		// Random velocity in a cone based on emitter's parameters
 		vec4 newVelocity(Emitter em){
@@ -213,7 +190,6 @@ void ParticleManager::loadShader(){
 
 			lifespan[gid] = newLifespan(em);
 			p[gid].pos = newPosition(em);
-			// p[gid].pos = vec4(0.0, 0.0, 0.0, 1.0);
 			p[gid].vel = newVelocity(em);
 			p[gid].acc = vec4(0.0, 0.0, 0.0, 1.0);
 		}
