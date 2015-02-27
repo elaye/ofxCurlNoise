@@ -12,6 +12,8 @@ This addon provides a particle system with a curl noise.
 
 The code for the curl noise comes from [dli/flow](https://github.com/dli/flow).
 
+Demo video: [vimeo.com/120776831](https://vimeo.com/120776831)
+
 Installation
 ------------
 
