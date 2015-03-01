@@ -6,9 +6,10 @@ void ofApp::setup(){
 
 	// Setup the particle emitter
 	emitter.setup();
-	// Setup the curl noise, pass the emitter and 
-	// the number of particles we want
-	curlNoise.setup(emitter, 1024*256);
+	// Setup the curl noise with 1024*256 particles
+	curlNoise.setup(1024*256);
+	// Add the particle emitter
+	curlNoise.addEmitter(emitter);
 
 	// Setup gui
 	emitterPanel.setup(emitter.parameters);

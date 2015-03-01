@@ -11,9 +11,11 @@ void ofApp::setup(){
 		e.setup();
 	}
 
-	// Setup the curl noise, pass the emitter and 
-	// the number of particles we want
-	curlNoise.setup(emitters, 1024*256);
+	// Setup the curl noise with the number of particles we want
+	curlNoise.setup(1024*256);
+	// Add particle emitters
+	curlNoise.addEmitters(emitters);
+	// Set the noise turbulence
 	curlNoise.setTurbulence(0.3);
 
 	renderShader.load("shaders/render_vert.glsl", "shaders/render_frag.glsl");

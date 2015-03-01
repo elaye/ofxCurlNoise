@@ -26,7 +26,9 @@ class ParticleManager{
 	ofShader shader;
 	
 	public:
-		void setup(int k, int n);
+		void setup(int n);
+		void addEmitter();
+		void addEmitters(int n);
 		void update();
 		void updateEmitter(EmitterData& emitterData);
 		void draw();
@@ -38,4 +40,5 @@ class ParticleManager{
 	private:
 		void initParticles();
 		void loadShader();
+		void reloadShader();
 };

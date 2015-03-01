@@ -29,7 +29,8 @@ After this, you can initialize the particle system with the initialized emitter 
 
     void ofApp::setup(){
     	emitter.setup();
-    	curlNoise.setup(emitter, 1024*256);
+    	curlNoise.setup(1024*256);
+        curlNoise.addEmitter(emitter);
     }
 
 Then you update the position of your particle emitter and the particle system.
@@ -47,7 +48,7 @@ Finally you draw the particles.
     	curlNoise.draw(;)
     }
 
-You can use multiple particle emitters. To do this, initialize the particle system with a `vector<ParticleEmitter>` (see advanced example).
+You can use multiple particle emitters. To do this, call `ofxCurlNoise::addEmitters(vector<ParticleEmitter> emitters)` (see advanced example).
 
 You can set the turbulence coefficient of the curl noise programmatically by calling `ofxCurlNoise::setTurbulence(float t)`.
 

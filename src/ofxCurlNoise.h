@@ -11,15 +11,14 @@ class ofxCurlNoise {
 	ParticleManager particleManager;
 	CurlNoise curlNoise;
 
-	// ofVbo particlesVbo;
-
 	ofParameter<bool> bCurlNoise;
 
 	public:
 		ofParameterGroup parameters;
 		ofParameterGroup advancedParameters;
-		void setup(ParticleEmitter& emitter, int n);
-		void setup(vector<ParticleEmitter>& emitters, int n);
+		void setup(int n);
+		void addEmitter(ParticleEmitter& emitter);
+		void addEmitters(vector<ParticleEmitter>& emitters);
 		void update();
 		void draw();
 
@@ -28,9 +27,6 @@ class ofxCurlNoise {
 		ofVbo& getParticleBuffer(){ return particleManager.getVbo(); }
 
 		void setTurbulence(float t){ curlNoise.setTurbulence(t); }
-
-	private:
-		void setup(int k, int n);
 
 };
 

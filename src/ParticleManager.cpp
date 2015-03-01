@@ -1,7 +1,6 @@
 #include "ParticleManager.h"
 
-void ParticleManager::setup(int k, int n){
-	emittersData.resize(k);
+void ParticleManager::setup(int n){
 	particles.resize(n);
 
 	initParticles();
@@ -22,7 +21,15 @@ void ParticleManager::setup(int k, int n){
 
 	vbo.setVertexBuffer(particlesBuffer, 4, sizeof(Particle));
 
-	loadShader();	
+}
+
+void ParticleManager::addEmitter(){
+	addEmitters(1);
+}
+
+void ParticleManager::addEmitters(int n){
+	emittersData.resize(emittersData.size() + n);
+	reloadShader();
 }
 
 void ParticleManager::setAttributes(ofShader& renderShader){
@@ -39,6 +46,9 @@ void ParticleManager::initParticles(){
 }
 
 void ParticleManager::update(){
+	if(!shader.isLoaded() && emittersData.size() == 0){
+		ofLogError() << "You need to add at least one particle emitter";
+	}
 	shader.begin();
 		for(uint i = 0; i < emittersData.size(); ++i){
 			string is = ofToString(i);
@@ -65,11 +75,16 @@ void ParticleManager::update(){
 }
 
 void ParticleManager::updateEmitter(EmitterData& emitterData){
+	// if(emitterData.id >= emittersData.size()) ofLogError() << "";
 	emittersData[emitterData.id] = emitterData;
 }
 
 void ParticleManager::draw(){
 	vbo.draw(GL_POINTS, 0, vbo.getNumVertices());	
+}
+
+void ParticleManager::reloadShader(){
+	loadShader();
 }
 
 void ParticleManager::loadShader(){
