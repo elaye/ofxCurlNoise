@@ -24,8 +24,8 @@ Usage
 
 You first have to set the OpenGL version to 4.3 in the `main.cpp` of your project before using this addon. You can look at one of the examples to see how to do it.
 
-First, you need to create and initialize a `ParticleEmitter`.
-After this, you can initialize the particle system with the initialized emitter and a number of particles for your particle system. For the moment, it works well only with a number of particles that is a **power of 2**. Here is how your `ofApp::setup()` should look like:
+First, you need to create and setup a `ParticleEmitter` with the number of particles you want.
+After this, you can initialize the particle system. For the moment, it works well only with a number of particles that is a **power of 2**. Here is how your `ofApp::setup()` should look like:
 
     void ofApp::setup(){
         // Number of particles
