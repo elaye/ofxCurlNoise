@@ -29,16 +29,17 @@ class ParticleEmitter{
 	ofQuaternion defaultOrientation;
 	float prevTime;
 
-	ofParameterGroup parameters;
 	
 	public:
+		ofParameterGroup parameters;
+		
 		ParticleEmitter(){ id = count; ++count; }
 		void setup(int n);
 		void update(float x, float y, float z = 0.0);
 		void draw();
 		void setOrientation(ofQuaternion q){ orientation = q; }
 
-		const ofParameterGroup& getParameters() const { return parameters; }
+		// const ofParameterGroup& getParameters() const { return parameters; }
 
 	private:
 		void loadShader();

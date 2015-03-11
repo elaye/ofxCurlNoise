@@ -4,7 +4,7 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofSetFrameRate(60);
 
-	// Particle number
+	// Particles number
 	int n = 1024*256;
 
 	// Setup the particle emitter
@@ -15,7 +15,7 @@ void ofApp::setup(){
 	// curlNoise.addEmitter(emitter);
 
 	// Setup gui
-	emitterPanel.setup(emitter.getParameters());
+	emitterPanel.setup(emitter.parameters);
 	emitterPanel.add(bMouse.setup("Mouse", false));
 	
 	curlNoisePanel.setup(curlNoise.parameters);

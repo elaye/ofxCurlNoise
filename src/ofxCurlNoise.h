@@ -18,8 +18,6 @@ class ofxCurlNoise {
 		ofParameterGroup parameters;
 		ofParameterGroup advancedParameters;
 		void setup(int n);
-		// void addEmitter(ParticleEmitter& emitter);
-		// void addEmitters(vector<ParticleEmitter>& emitters);
 		void update();
 		void draw();
 

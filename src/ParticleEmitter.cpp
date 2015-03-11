@@ -149,7 +149,6 @@ string ParticleEmitter::getMainCode(){
 					respawn(gid);
 					emitterId[gid] = int(id);
 				}
-			// p[gid].pos.xyz = pos.xyz;
 			}
 		}
 	) << endl;

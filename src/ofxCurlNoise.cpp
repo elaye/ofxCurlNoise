@@ -1,17 +1,5 @@
 #include "ofxCurlNoise.h"
 
-// void ofxCurlNoise::addEmitter(ParticleEmitter& emitter){
-// 	ofAddListener(emitter.updated, &particleManager, &ParticleManager::updateEmitter);
-// 	particleManager.addEmitter();
-// }
-
-// void ofxCurlNoise::addEmitters(vector<ParticleEmitter>& emitters){
-// 	for(auto& e : emitters){
-// 		ofAddListener(e.updated, &particleManager, &ParticleManager::updateEmitter);
-// 	}
-// 	particleManager.addEmitters(emitters.size());
-// }
-
 void ofxCurlNoise::setup(int n){
 	particleManager.setup(n);
 

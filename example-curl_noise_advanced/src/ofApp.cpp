@@ -4,17 +4,18 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofSetFrameRate(60);
 
+	// Particles number
+	int n = 1024*256;
+
 	// Create 3 particle emitters 
 	emitters = {ParticleEmitter(), ParticleEmitter(), ParticleEmitter()};
 	// Setup the particle emitters
 	for(auto& e : emitters){
-		e.setup();
+		e.setup(n);
 	}
 
 	// Setup the curl noise with the number of particles we want
-	curlNoise.setup(1024*256);
-	// Add particle emitters
-	curlNoise.addEmitters(emitters);
+	curlNoise.setup(n);
 	// Set the noise turbulence
 	curlNoise.setTurbulence(0.3);
 
