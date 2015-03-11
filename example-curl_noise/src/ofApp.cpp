@@ -4,13 +4,11 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofSetFrameRate(60);
 
-	// Particles number
-	int n = 1024*256;
-
 	// Setup the particle emitter
-	emitter.setup(n);
+	// emitter.setup(n);
+	emitter.setup();
 	// Setup the curl noise with 1024*256 particles
-	curlNoise.setup(n);
+	curlNoise.setup(1024*256);
 	// Add the particle emitter
 	// curlNoise.addEmitter(emitter);
 

@@ -2,8 +2,10 @@
 
 #include "ofMain.h"
 
-#define STRINGIFY(...) #__VA_ARGS__
-#define WGS 256
+#include "ParticleManager.h"
+
+// #define STRINGIFY(...) #__VA_ARGS__
+// #define WGS 256
 
 class ParticleEmitter{
 
@@ -24,7 +26,7 @@ class ParticleEmitter{
 	ofParameter<float> averageLifespan, lifespanVariation;
 	ofParameter<bool> bUseEmitterVelocity, bUseEmitterVelDir;
 	
-	int id, particleNumber;
+	int id;// , particleNumber;
 
 	ofQuaternion defaultOrientation;
 	float prevTime;
@@ -34,7 +36,8 @@ class ParticleEmitter{
 		ofParameterGroup parameters;
 		
 		ParticleEmitter(){ id = count; ++count; }
-		void setup(int n);
+		// void setup(int n);
+		void setup();
 		void update(float x, float y, float z = 0.0);
 		void draw();
 		void setOrientation(ofQuaternion q){ orientation = q; }

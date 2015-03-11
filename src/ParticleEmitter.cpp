@@ -2,8 +2,9 @@
 
 uint ParticleEmitter::count = 0;
 
-void ParticleEmitter::setup(int n){
-	particleNumber = n;
+// void ParticleEmitter::setup(int n){
+void ParticleEmitter::setup(){
+	// particleNumber = n;
 
 	parameters.setName("Particle emitter " + ofToString(id+1));
 	parameters.add(averageLifespan.set("Average lifespan", 120.0, 1.0, 600.0));
@@ -58,7 +59,8 @@ void ParticleEmitter::update(float x, float y, float z){
 		shader.setUniform1i("id", id);
 		shader.setUniform1i("count", count);
 
-		shader.dispatchCompute(particleNumber/WGS, 1, 1);
+		// shader.dispatchCompute(particleNumber/WGS, 1, 1);
+		shader.dispatchCompute(ParticleManager::getParticleNumber()/WORK_GROUP_SIZE, 1, 1);
 	shader.end();
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	ofVec3f velDir = 0.9*velDir + 0.1*vel;
@@ -70,8 +72,9 @@ void ParticleEmitter::update(float x, float y, float z){
 void ParticleEmitter::loadShader(){
 	ostringstream cs;
 	cs << "#version 430" << endl;
-	cs << "layout(local_size_x = " << WGS << ", local_size_y = 1, local_size_z = 1) in;" << endl;
+	cs << "layout(local_size_x = " << WORK_GROUP_SIZE << ", local_size_y = 1, local_size_z = 1) in;" << endl;
 	cs << STRINGIFY(
+
 		struct Particle{
 		    vec4 pos;
 		    vec4 vel;

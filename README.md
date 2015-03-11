@@ -24,14 +24,12 @@ Usage
 
 You first have to set the OpenGL version to 4.3 in the `main.cpp` of your project before using this addon. You can look at one of the examples to see how to do it.
 
-First, you need to create and setup a `ParticleEmitter` with the number of particles you want.
-After this, you can initialize the particle system. For the moment, it works well only with a number of particles that is a **power of 2**. Here is how your `ofApp::setup()` should look like:
+First, you need to create and setup a `ParticleEmitter`.
+After this, you can setup the particle system with the number of particles you want. For the moment, it works well only with a number of particles that is a **power of 2**. Here is how your `ofApp::setup()` should look like:
 
     void ofApp::setup(){
-        // Number of particles
-        int n = 1024*256;
-    	emitter.setup(n);
-    	curlNoise.setup(n);
+    	emitter.setup();
+    	curlNoise.setup(1024*256);
     }
 
 Then you update the position of your particle emitter and the particle system.

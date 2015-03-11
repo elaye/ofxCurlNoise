@@ -19,6 +19,8 @@ class ParticleManager{
 	ofVbo vbo;
 
 	ofShader shader;
+
+	static int particleNumber;
 	
 	public:
 		void setup(int n);
@@ -28,6 +30,8 @@ class ParticleManager{
 		void setAttributes(ofShader& renderShader);
 
 		ofVbo& getVbo(){ return vbo; }
+
+		static int getParticleNumber(){ return particleNumber; }
 
 	private:
 		void initParticles();

@@ -1,6 +1,9 @@
 #include "ParticleManager.h"
 
+int ParticleManager::particleNumber = 0;
+
 void ParticleManager::setup(int n){
+	particleNumber = n;
 	particles.resize(n);
 
 	initParticles();
