@@ -2,51 +2,48 @@
 
 #include "ofMain.h"
 
-struct EmitterData{
-	ofVec4f pos;
-	ofVec4f vel;
-	ofVec4f acc;
-	ofVec4f prevPos;
-	ofQuaternion orientation;
-	ofParameter<float> radius;
-	ofParameter<float> velocityAngle;
-	ofParameter<float> velocityScale;
-	ofParameter<float> averageLifespan;
-	ofParameter<float> lifespanVariation;
-	ofParameter<float> averageVelocity;
-	ofParameter<float> velocityVariation;
-	ofParameter<bool> bUseEmitterVelocity;
-	int id;
-};
+#define STRINGIFY(...) #__VA_ARGS__
+#define WGS 256
 
 class ParticleEmitter{
 
+	// Number of Emitter instances
 	static uint count;
 
-	EmitterData data;
+	ofVec3f pos, vel, acc;
+	ofVec3f prevPos;
+	ofVec3f velDir;
+	// ofVec3f emissionDir;
+
+	ofShader shader;
+
+	ofQuaternion orientation;
+	
+	ofParameter<float> radius;
+	ofParameter<float> emissionAngle, velocityScale, averageVelocity, velocityVariation;
+	ofParameter<float> averageLifespan, lifespanVariation;
+	ofParameter<bool> bUseEmitterVelocity, bUseEmitterVelDir;
+	
+	int id, particleNumber;
 
 	ofQuaternion defaultOrientation;
 	float prevTime;
 
+	ofParameterGroup parameters;
+	
 	public:
-		ofEvent<EmitterData> updated;
-
-		ofParameterGroup parameters;
-		ParticleEmitter(){ data.id = count; ++count; }
-		// ~ParticleEmitter(){ --count; }
-		void setup();
+		ParticleEmitter(){ id = count; ++count; }
+		void setup(int n);
 		void update(float x, float y, float z = 0.0);
 		void draw();
+		void setOrientation(ofQuaternion q){ orientation = q; }
 
-		// void setOrientation(ofQuaternion q){ defaultOrientation = q; }
+		const ofParameterGroup& getParameters() const { return parameters; }
 
-		int getId() { return data.id; }
-		const ofPoint getPos() const { return data.pos; }
-
-		// ostream& operator<<(ostream& os)
-		// {
-		// 	Emitter e = getData();
-		// 	os << e.pos << '/' << e.vel << '/' << e.acc;
-		// 	return os;
-		// }
+	private:
+		void loadShader();
+		string getShaderCode();
+		string getMainCode();
+		string getEmitterCode();
+		string getUtilityCode();
 };

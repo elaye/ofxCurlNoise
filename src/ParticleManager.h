@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 
-#include "ParticleEmitter.h"
+// #include "ParticleEmitter.h"
 
 #define WORK_GROUP_SIZE 256
 #define STRINGIFY(...) #__VA_ARGS__
@@ -16,7 +16,7 @@ struct Particle {
 
 class ParticleManager{
 
-	vector<EmitterData> emittersData;
+	// vector<EmitterData> emittersData;
 
 	vector<Particle> particles;
 	ofBufferObject particlesBuffer, lifespanBuffer, emitterIdBuffer;
@@ -27,10 +27,10 @@ class ParticleManager{
 	
 	public:
 		void setup(int n);
-		void addEmitter();
-		void addEmitters(int n);
+		// void addEmitter();
+		// void addEmitters(int n);
 		void update();
-		void updateEmitter(EmitterData& emitterData);
+		// void updateEmitter(EmitterData& emitterData);
 		void draw();
 
 		void setAttributes(ofShader& renderShader);
@@ -40,5 +40,5 @@ class ParticleManager{
 	private:
 		void initParticles();
 		void loadShader();
-		void reloadShader();
+		// void reloadShader();
 };

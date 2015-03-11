@@ -4,15 +4,18 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	ofSetFrameRate(60);
 
+	// Particle number
+	int n = 1024*256;
+
 	// Setup the particle emitter
-	emitter.setup();
+	emitter.setup(n);
 	// Setup the curl noise with 1024*256 particles
-	curlNoise.setup(1024*256);
+	curlNoise.setup(n);
 	// Add the particle emitter
-	curlNoise.addEmitter(emitter);
+	// curlNoise.addEmitter(emitter);
 
 	// Setup gui
-	emitterPanel.setup(emitter.parameters);
+	emitterPanel.setup(emitter.getParameters());
 	emitterPanel.add(bMouse.setup("Mouse", false));
 	
 	curlNoisePanel.setup(curlNoise.parameters);
@@ -50,6 +53,8 @@ void ofApp::draw(){
 		ofTranslate(ofGetWidth()/2.0, ofGetHeight()/2.0);
 		// Draw particles
 		curlNoise.draw();
+		ofSetColor(ofColor::white);
+		emitter.draw();
 	ofPopMatrix();
 	
 	// Draw GUI
